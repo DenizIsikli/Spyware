@@ -277,7 +277,7 @@ class FILE_ENCRYPTION(BaseClass):
         # Get the relative path to the folder from the base folder
         rel_folder_path = os.path.relpath(folder_path, self.base_folder)
 
-        # Create the corresponding encrypted folder path inside "encrypted_folders"
+        # Create the corresponding encrypted folder path inside "Encrypted_Folders"
         encrypted_folder_path = os.path.join(self.encrypted_folders_dir, rel_folder_path)
 
         # Copy the original folder to the encrypted folder
@@ -300,8 +300,7 @@ class FILE_ENCRYPTION(BaseClass):
                     f.write(encrypted_content)
 
     def encrypt_folders(self):
-        if not os.path.exists(self.key_path):
-            self.generate_key()
+        self.generate_key()
 
         # Create the "encrypted_folders" directory if it doesn't exist
         os.makedirs(self.encrypted_folders_dir, exist_ok=True)

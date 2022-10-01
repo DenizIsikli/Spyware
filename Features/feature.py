@@ -67,6 +67,7 @@ class SCREENSHOTS(BaseClass):
 
     def create_subfolder(self):
         subfolder_path = os.path.join(self.folder_path, self.folder_name)
+
         if not os.path.exists(subfolder_path):
             os.makedirs(subfolder_path)
         return subfolder_path
@@ -170,7 +171,8 @@ class SYS_INFO(BaseClass):
             print(f"An error occurred: {str(e)}")
 
         # Open/Create file path
-        with open(os.path.join(self.folder_path, self.output_file_name), "a") as f:
+        file_path = os.path.join(self.folder_path, self.output_file_name)
+        with open(file_path, "a") as f:
             hostname = socket.gethostname()
             IPAddr = socket.gethostbyname(hostname)
 
@@ -227,8 +229,9 @@ class CMD_PROMPTS(BaseClass):
         except Exception as e:
             print(f"An error occurred: {str(e)}")
 
-        # Open/Create file path
-        with open(os.path.join(self.folder_path, self.output_file_name), "a") as f:
+        # Open/Create file path'
+        file_path = os.path.join(self.folder_path, self.output_file_name)
+        with open(file_path, "a") as f:
             f.write("-----------------------------BEGIN-----------------------------\n")
 
             f.write(f"{self.network_data}\n\n\n")

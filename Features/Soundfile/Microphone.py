@@ -7,12 +7,13 @@ import pyaudio
 import wave
 
 # Custom module
-import Util.DataClass as Data_Class
+from Util.DataClass import DataClass
 
 
-class Microphone(Data_Class):
+class Microphone(DataClass):
     def __init__(self):
-        self.baseclass = Data_Class.DataClass.__init__(self)  # Call the base class __init__ method
+        super().__init__()  # Call the base class __init__ method
+        self.baseclass = DataClass()  # Create an instance of the DataClass
 
         # Constants for audio settings
         self.end_time = self.baseclass.end_time

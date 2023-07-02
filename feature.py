@@ -1,13 +1,10 @@
 # Libraries
-import socket
 import cv2
 from PIL import ImageGrab
 import sounddevice as sd
 import wavfile as wf
 import os
-import numpy as np
 import time
-import threading
 import socket
 from requests import get
 import platform

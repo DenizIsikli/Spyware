@@ -84,7 +84,7 @@ class SYS_INFO:
         self.public_ip_link = "https://api.ipify.org"
 
     def system_information(self):
-        with open(self.folder_path, "a") as f:
+        with open(os.path.join(self.folder_path, self.output_file_name), "a") as f:
             hostname = socket.gethostbyname()
             IPAddr = socket.gethostbyname(hostname)
 
@@ -99,3 +99,21 @@ class SYS_INFO:
             f.write(f"Machine Info: {platform.machine()}\n")
             f.write(f"Hostname: {hostname}\n")
             f.write(f"Private IP Address: {IPAddr}\n")
+
+    def os_version(self):
+        platform_switch = {
+            'Windows': lambda: print(f"Windows version: {platform.win32_ver()}\n"),
+            'Darwin': lambda: print(f"Mac version: {platform.mac_ver()}\n"),
+            'Linux': lambda: print(f"Linux version: {platform.libc_ver()}\nLinux version: {platform.freedesktop_os_release()}\n")
+        }
+        try:
+            platform_name = platform.system()
+            get_os = platform_switch.get(platform_name)
+
+            if get_os:
+                get_os()
+            else:
+                raise Exception("Unsupported platform")
+
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")

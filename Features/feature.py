@@ -11,6 +11,8 @@ import socket
 from requests import get
 import platform
 from datetime import date, datetime
+from getmac import get_mac_address
+import subprocess
 
 # Base class for widely used variables
 class BaseClass:
@@ -100,15 +102,41 @@ class SYS_INFO(BaseClass):
 
         # Folder path and filename
         self.folder_path = self.folder_path_sys_info
-        self.output_file_name = "systeminfo.txt"
+        self.output_file_name = "SystemInformation.txt"
 
         # Public IP website link
         self.public_ip_link = "https://api.ipify.org"
 
+        # Mac address
+        self.mac_address = get_mac_address()
+
     def system_information(self):
+        platform_switch = {
+            # platform.win32_ver(release='', version='', csd='', ptype='')
+            'Windows': lambda: platform.win32_ver(),
+            # platform.mac_ver(release='', versioninfo=('', '', ''), machine='')
+            'Darwin': lambda: platform.mac_ver(),
+            # platform.libc_ver(executable=sys.executable, lib='', version='', chunksize=16384)
+            'Linux': lambda: platform.libc_ver()
+        }
+
+        try:
+            platform_name = platform.system()
+            get_os = platform_switch.get(platform_name)
+
+            if get_os:
+                os_info = get_os()  # Call the lambda function
+            else:
+                raise Exception("Unsupported platform")
+
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+
         with open(os.path.join(self.folder_path, self.output_file_name), "a") as f:
-            hostname = socket.gethostbyname()
+            hostname = socket.gethostname()
             IPAddr = socket.gethostbyname(hostname)
+
+            f.write("-----------------------------BEGIN-----------------------------\n\n")
 
             try:
                 public_ip = get(self.public_ip_link).text
@@ -117,27 +145,20 @@ class SYS_INFO(BaseClass):
                 f.write("Couldn't get Public IP Address (May be due to max query)\n")
 
             f.write(f"Processor Info: {platform.processor()}\n")
-            f.write(f"System Info: {platform.system()}\n")
+            f.write(f"OS Info: {platform.system()}\n")
+            f.write(f"Detailed OS Info: {os_info}\n")
             f.write(f"Machine Info: {platform.machine()}\n")
             f.write(f"Hostname: {hostname}\n")
-            f.write(f"Private IP Address: {IPAddr}\n\n\n")
+            f.write(f"Private IP Address: {IPAddr}\n")
+            f.write(f"Mac Address: {self.mac_address}\n\n\n")
 
-            f.write(f"Current date: {self.currentDate} || Current time: {self.currentTime}")
+            f.write(f"Current date: {self.currentDate} || Current time: {self.currentTime}\n\n")
 
-    def os_version(self):
-        platform_switch = {
-            'Windows': lambda: print(f"Windows version: {platform.win32_ver()}\n"),
-            'Darwin': lambda: print(f"Mac version: {platform.mac_ver()}\n"),
-            'Linux': lambda: print(f"Linux version: {platform.libc_ver()}\nLinux version: {platform.freedesktop_os_release()}\n")
-        }
-        try:
-            platform_name = platform.system()
-            get_os = platform_switch.get(platform_name)
+            f.write("------------------------------END------------------------------\n\n\n")
 
-            if get_os:
-                get_os()
-            else:
-                raise Exception("Unsupported platform")
+class CMD(BaseClass):
+    def __init__(self):
+        pass
 
-        except Exception as e:
-            print(f"An error occurred: {str(e)}")
+    def cmd_prompts(self):
+        pass

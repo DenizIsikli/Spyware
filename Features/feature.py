@@ -32,18 +32,24 @@ class WEBCAMERA(BaseClass):
     def __init__(self):
         super().__init__() # Call the base class __init__ method
 
-    def webcamera(self):
-        cap = VideoCapture(0)
-        frame, image = cap.read()
+        self.cap = None
+        self.frame = None
 
-        while frame:
+    def webcamera(self):
+        try:
+            self.cap = VideoCapture(0)
+            self.frame, image = self.cap.read()
+        except cv2.error as e:
+            print(f"Camera is not working, or the host might not have one: {e}")
+
+        while self.frame:
             imshow('Webcam', image)
             imwrite('WebCamera.png', image)
 
             if cv2.waitKey(1) == ord('q'):
                 break
 
-        cap.release()
+        self.cap.release()
         cv2.destroyAllWindows()
 
 class SCREENSHOTS(BaseClass):
@@ -93,7 +99,7 @@ class SCREENSHOTS(BaseClass):
                 print("Program stopped by user.")
                 break
 
-            time.sleep(1)
+            time.sleep(self.sleepAmount)
 
 class MICROPHONE(BaseClass):
     def __init__(self):

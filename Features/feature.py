@@ -172,25 +172,36 @@ class CMD_PROMPTS(BaseClass):
         self.output_file_name = "CMDPrompts.txt"
 
         # Default value
-        self.ipconfig_all_data = None
+        self.network_data = None
 
     def ipconfig_all(self):
-        try:
-            # Execute the ipconfig /all command
-            self.ipconfig_all_data = subprocess.check_output(['ipconfig', '/all'], text=True)
-        except subprocess.CalledProcessError as e:
-            print("Failed to run command. Return code:", e.returncode)
-            print("Output:", e.output)
+        platform_switch = {
+            # ipconfig
+            'Windows': lambda: subprocess.check_output(['ipconfig', '/all'], text=True),
+            # ifconfig
+            'Darwin': lambda: subprocess.check_output(['ifconfig', '-a'], text=True),  # For ifconfig output
+            # ifconfig
+            'Linux': lambda: subprocess.check_output(['ifconfig', '-a'], text=True)
+        }
 
+        try:
+            # Get hosts platform system and the matching keys in the dictionary
+            platform_name = platform.system()
+            get_os = platform_switch.get(platform_name)
+
+            if get_os:
+                self.network_data = get_os()  # Call the lambda function
+            else:
+                raise Exception("Unsupported platform")
         except Exception as e:
-            print("An error occurred:", str(e))
+            print(f"An error occurred: {str(e)}")
 
         # Open/Create file path
         with open(os.path.join(self.folder_path, self.output_file_name), "a") as f:
             f.write("-----------------------------BEGIN-----------------------------\n")
 
-            f.write(f"{self.ipconfig_all_data}\n\n\n")
+            f.write(f"{self.network_data}\n\n\n")
 
-            f.write(f"Current date: {self.currentDate} || Current time: {self.currentTime}\n")
+            f.write(f"Current date: {self.currentDate} || Current time: {self.currentTime}\n\n")
 
             f.write("------------------------------END------------------------------\n\n\n")

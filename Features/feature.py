@@ -1,6 +1,6 @@
 # Libraries
 import datetime
-
+import sys
 import cv2
 from PIL import ImageGrab
 import sounddevice as sd
@@ -13,6 +13,7 @@ import platform
 from datetime import date, datetime
 from getmac import get_mac_address
 import subprocess
+import keyboard
 
 # Base class for widely used variables
 class BaseClass:
@@ -55,19 +56,42 @@ class SCREENSHOTS(BaseClass):
 
         # Folder path and filename
         self.folder_path = self.folder_path_screenshots
-        self.output_file_name = f"Screenshot{self.counter}.png"
+        self.folder_name = f"Subfolder{date.today(), datetime.now()}"
+        self.image = None
+
+    def create_subfolder(self):
+        subfolder_path = os.path.join(self.folder_path, self.folder_name)
+        if not os.path.exists(subfolder_path):
+            os.makedirs(subfolder_path)
+        return subfolder_path
 
     def screenshots(self):
+        subfolder_path = self.create_subfolder()
+
         while True:
-            image = ImageGrab.grab()
+            try:
+                self.image = ImageGrab.grab()
+            except Exception as e:
+                print(f"Error while grabbing the image: {e}")
+                break
+
             self.counter += 1
 
             if not os.path.exists(self.folder_path):
                 os.makedirs(self.folder_path)
 
             # Save captured screenshots to the file path
-            file_path = os.path.join(self.folder_path, self.output_file_name)
-            image.save(file_path)
+            output_file_name = f"Screenshot{self.counter}.png"
+            file_path = os.path.join(subfolder_path, output_file_name)
+            self.image.save(file_path)
+
+            # Flush the output to display immediately
+            sys.stdout.flush()
+
+            # Check if the 'Esc' key is pressed
+            if keyboard.is_pressed('q') or keyboard.is_pressed('Q'):
+                print("Program stopped by user.")
+                break
 
             time.sleep(1)
 

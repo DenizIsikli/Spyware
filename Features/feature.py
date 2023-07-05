@@ -115,15 +115,16 @@ class MICROPHONE(BaseClass):
 
     def microphone(self):
         while True:
-            # Record
-            audio_data = sd.rec(int(self.sample_rate * self.duration), samplerate = self.sample_rate, channels = 2)
+            try:
+                # Record
+                audio_data = sd.rec(int(self.sample_rate * self.duration), samplerate = self.sample_rate, channels = 2)
+            except sd.PortAudioError as e:
+                print(f"Audio recording error: {e}")
 
             if not os.path.exists(self.folder_path):
                 os.makedirs(self.folder_path)
 
             sd.wait()
-
-            print("Finished capturing audio.\n")
 
             # Save captured audio to the file path
             file_path = os.path.join(self.folder_path, self.output_file_name)

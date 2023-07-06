@@ -1,8 +1,12 @@
 import threading
 
 import Features.feature
-from Features.feature import WEBCAMERA, SCREENSHOTS, MICROPHONE, SYS_INFO, CMD_PROMPTS
-
+from Features.feature import \
+    WEBCAMERA, \
+    SCREENSHOTS, \
+    MICROPHONE, \
+    SYS_INFO, \
+    CMD_PROMPTS
 
 class MainFileException(Exception):
     pass

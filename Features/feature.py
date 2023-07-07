@@ -249,7 +249,8 @@ class CmdPrompts(BaseClass):
         self.output_file_name = "CMDPrompts.txt"
 
         # Default value
-        self.network_data = None
+        self.ipconfig_data = None
+        self.netstat_data = None
 
     def ipconfig_all(self):
         platform_switch = {
@@ -267,7 +268,7 @@ class CmdPrompts(BaseClass):
             get_os = platform_switch.get(platform_name)
 
             if get_os:
-                self.network_data = get_os()  # Call the lambda function
+                self.ipconfig_data = get_os()  # Call the lambda function
             else:
                 raise Exception("Unsupported platform")
         except Exception as e:
@@ -278,12 +279,44 @@ class CmdPrompts(BaseClass):
         with open(file_path, "a") as f:
             f.write("-----------------------------BEGIN-----------------------------\n")
 
-            f.write(f"{self.network_data}\n\n\n")
+            f.write(f"{self.ipconfig_data}\n\n\n")
 
             f.write(f"Current date: {self.currentDate} || Current time: {self.currentTime}\n\n")
 
             f.write("------------------------------END------------------------------\n\n\n")
 
+    def netstat_ano(self):
+        platform_switch = {
+            # netstat -ano
+            'Windows': lambda: subprocess.check_output(['netstat', '-ano'], text=True),
+            # netstat -anp
+            'Darwin': lambda: subprocess.check_output(['netstat', '-anp'], text=True),  # For ifconfig output
+            # netstat -anp
+            'Linux': lambda: subprocess.check_output(['netstat', '-anp'], text=True)
+        }
+
+        try:
+            # Get hosts platform system and the matching keys in the dictionary
+            platform_name = platform.system()
+            get_os = platform_switch.get(platform_name)
+
+            if(get_os):
+                self.netstat_data = get_os
+            else:
+                raise Exception("Unsupported platform")
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+
+        # Open/Create file path
+        file_path = os.path.join(self.folder_path, self.output_file_name)
+        with open(file_path, "a") as f:
+            f.write("-----------------------------BEGIN-----------------------------\n")
+
+            f.write(f"{self.netstat_data}\n\n\n")
+
+            f.write(f"Current date: {self.currentDate} || Current time: {self.currentTime}\n\n")
+
+            f.write("------------------------------END------------------------------\n\n\n")
 
 class FileEncryption(BaseClass):
     def __init__(self):

@@ -246,7 +246,8 @@ class CmdPrompts(BaseClass):
 
         # Folder path and filename
         self.folder_path = self.folder_path_cmd_prompts
-        self.output_file_name = "CMDPrompts.txt"
+        self.ipconfigall_output_file_name = "Ipconfig.txt"
+        self.netstat_output_file_name = "Netstat.txt"
 
         # Default value
         self.ipconfig_data = None
@@ -257,7 +258,7 @@ class CmdPrompts(BaseClass):
             # ipconfig
             'Windows': lambda: subprocess.check_output(['ipconfig', '/all'], text=True),
             # ifconfig
-            'Darwin': lambda: subprocess.check_output(['ifconfig', '-a'], text=True),  # For ifconfig output
+            'Darwin': lambda: subprocess.check_output(['ifconfig', '-a'], text=True),
             # ifconfig
             'Linux': lambda: subprocess.check_output(['ifconfig', '-a'], text=True)
         }
@@ -275,7 +276,7 @@ class CmdPrompts(BaseClass):
             print(f"An error occurred: {str(e)}")
 
         # Open/Create file path
-        file_path = os.path.join(self.folder_path, self.output_file_name)
+        file_path = os.path.join(self.folder_path, self.ipconfigall_output_file_name)
         with open(file_path, "a") as f:
             f.write("-----------------------------BEGIN-----------------------------\n")
 
@@ -290,7 +291,7 @@ class CmdPrompts(BaseClass):
             # netstat -ano
             'Windows': lambda: subprocess.check_output(['netstat', '-ano'], text=True),
             # netstat -anp
-            'Darwin': lambda: subprocess.check_output(['netstat', '-anp'], text=True),  # For ifconfig output
+            'Darwin': lambda: subprocess.check_output(['netstat', '-anp'], text=True),
             # netstat -anp
             'Linux': lambda: subprocess.check_output(['netstat', '-anp'], text=True)
         }
@@ -300,15 +301,18 @@ class CmdPrompts(BaseClass):
             platform_name = platform.system()
             get_os = platform_switch.get(platform_name)
 
-            if(get_os):
-                self.netstat_data = get_os
+            if get_os:
+                netstat_output = get_os() # Call the lambda function
+
+                listening_lines = [line for line in netstat_output.split('\n') if 'LISTENING' in line]
+                self.netstat_data = '\n'.join(listening_lines)
             else:
                 raise Exception("Unsupported platform")
         except Exception as e:
             print(f"An error occurred: {str(e)}")
 
         # Open/Create file path
-        file_path = os.path.join(self.folder_path, self.output_file_name)
+        file_path = os.path.join(self.folder_path, self.netstat_output_file_name)
         with open(file_path, "a") as f:
             f.write("-----------------------------BEGIN-----------------------------\n")
 

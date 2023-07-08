@@ -157,21 +157,29 @@ class Microphone(BaseClass):
         self.output_file_name = f"Soundfile.wav"
 
     def audio_recording(self):
-        while True:
-            try:
-                # Record
-                self.audio_data = sd.rec(int(self.sample_rate * self.duration), samplerate=self.sample_rate, channels=2)
-            except sd.PortAudioError as e:
-                print(f"Audio recording error: {e}")
+        try:
+            # Record
+            self.audio_data = sd.rec(
+                int(self.sample_rate * self.duration),
+                samplerate=self.sample_rate,
+                channels=2
+            )
+
+            while True:
+                if keyboard.is_pressed('q'):
+                    break
+
+            sd.wait()
 
             if not os.path.exists(self.folder_path):
                 os.makedirs(self.folder_path)
 
-            sd.wait()
-
             # Save captured audio to the file path
             file_path = os.path.join(self.folder_path, self.output_file_name)
             wf.write(file_path, self.sample_rate, self.audio_data)
+
+        except sd.PortAudioError as e:
+            print(f"Audio recording error: {e}")
 
 
 class SysInfo(BaseClass):
@@ -314,7 +322,7 @@ class CmdPrompts(BaseClass):
         # Open/Create file path
         file_path = os.path.join(self.folder_path, self.netstat_output_file_name)
         with open(file_path, "a") as f:
-            f.write("-----------------------------BEGIN-----------------------------\n")
+            f.write("-----------------------------BEGIN-----------------------------\n\n")
 
             f.write(f"{self.netstat_data}\n\n\n")
 

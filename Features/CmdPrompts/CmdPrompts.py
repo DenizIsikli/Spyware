@@ -42,10 +42,6 @@ class CmdPrompts(Data_Class):
         except Exception as e:
             print(f"An error occurred: {str(e)}")
 
-        # Create the folder path if it doesn't exist
-        if not os.path.exists(self.folder_path):
-            os.makedirs(self.folder_path)
-
         # Open/Create file path
         file_path = os.path.join(self.folder_path, self.ipconfigall_output_file_name)
         with open(file_path, "a") as f:

@@ -46,10 +46,6 @@ class Screenshot(Data_Class):
 
             self.counter += 1
 
-            # Create the folder path if it doesn't exist
-            if not os.path.exists(self.folder_path):
-                os.makedirs(self.folder_path)
-
             # Save captured screenshots to the file path
             output_file_name = f"Screenshot{self.counter}.png"
             file_path = os.path.join(subfolder_path, output_file_name)

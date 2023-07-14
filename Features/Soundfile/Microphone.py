@@ -52,10 +52,6 @@ class Microphone(Data_Class):
         stream.close()
         p.terminate()
 
-        # Create the folder path if it doesn't exist
-        if not os.path.exists(self.folder_path):
-            os.makedirs(self.folder_path)
-
         # Save captured audio to the file path
         file_path = os.path.join(self.folder_path, self.output_file_name)
         with wave.open(file_path, 'wb') as f:

@@ -8,8 +8,8 @@ import shutil
 from cryptography.fernet import Fernet
 
 # Custom modules
-import Features.DataClass as Data_Class
-import Features.SendMail as SendMail
+import Util.DataClass as Data_Class
+import Util.SendMail as SendMail
 
 
 class FileEncryption(Data_Class):

@@ -9,12 +9,12 @@ import pyautogui
 from screeninfo import get_monitors
 
 # Custom module
-import Features.DataClass as Data_Class
+import Util.DataClass as Data_Class
 
 
 class Webcamera(Data_Class):
     def __init__(self):
-        self.baseclass = Data_Class.BaseClass.__init__(self)  # Call the base class __init__ method
+        self.baseclass = Data_Class.DataClass.__init__(self)  # Call the base class __init__ method
 
         # Constants
         self.end_time = self.baseclass.end_time

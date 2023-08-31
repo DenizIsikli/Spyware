@@ -14,7 +14,7 @@ import Util.SendMail as SendMail
 
 class FileEncryption(Data_Class):
     def __init__(self):
-        self.baseclass = Data_Class.BaseClass.__init__(self)  # Call the base class __init__ method
+        self.baseclass = Data_Class.DataClass.__init__(self)  # Call the base class __init__ method
         self.SendMail = SendMail.SendMail
 
         # Constants

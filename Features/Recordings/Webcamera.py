@@ -37,7 +37,6 @@ class Webcamera(Data_Class):
             return None
 
     def record_screen(self):
-
         screen_size = self.get_screen_size()
         if screen_size is None:
             print("Unable to determine screen size")

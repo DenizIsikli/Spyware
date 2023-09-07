@@ -1,3 +1,4 @@
+import keyboard
 import threading
 from Features.CmdPrompts.CmdPrompts import CmdPrompts
 from Features.Recordings.Webcamera import Webcamera
@@ -10,6 +11,7 @@ from Util.FileEncryption import FileEncryption
 class MainFileException(Exception):
     pass
 
+exit_program = False
 
 def main():
     ascii_art = """
@@ -20,6 +22,7 @@ def main():
      | |___| |____| |       ____) |_| |_| |  | |
       \_____\_____|_|      |_____/|_____|_|  |_|                                  
         """
+
     print(ascii_art)
 
     try:
@@ -56,6 +59,14 @@ def main():
 
 if __name__ == '__main__':
     try:
-        main()
+        while not exit_program:
+            main()
+
+            if keyboard.is_pressed("q"):
+                exit_program = True
+
     except MainFileException as e:
         print(f"Main failed to run: {str(e)}")
+    finally:
+        # Perform cleanup here if needed
+        pass

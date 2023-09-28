@@ -11,7 +11,9 @@ from Util.FileEncryption import FileEncryption
 class MainFileException(Exception):
     pass
 
+
 exit_program = False
+
 
 def main():
     ascii_art = """

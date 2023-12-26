@@ -10,13 +10,12 @@ import wave
 from Util.DataClass import DataClass
 
 
-class Microphone(DataClass):
+class Soundfile(DataClass):
     def __init__(self):
         super().__init__()  # Call the base class __init__ method
-        self.baseclass = DataClass()  # Create an instance of the DataClass
 
         # Constants for audio settings
-        self.end_time = self.baseclass.end_time
+        self.end_time = self.end_time
         self.format = pyaudio.paInt16
         self.channels = 2
         self.sample_rate = 44100  # Normal wave length for normal sound quality
@@ -27,7 +26,7 @@ class Microphone(DataClass):
         self.current_time = time.strftime("%Y%m%d-%H%M%S")
 
         # Folder path and filename
-        self.folder_path = self.baseclass.folder_path_soundfile
+        self.folder_path = self.folder_path_soundfile
         self.output_file_name = f"Soundfile{self.current_time}.wav"
 
     def audio_recording(self):

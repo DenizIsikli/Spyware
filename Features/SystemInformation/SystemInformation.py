@@ -11,13 +11,12 @@ from getmac import get_mac_address
 from Util.DataClass import DataClass
 
 
-class SysInfo(DataClass):
+class SystemInformation(DataClass):
     def __init__(self):
         super().__init__()  # Call the base class __init__ method
-        self.baseclass = DataClass()  # Create an instance of the DataClass
 
         # Folder path and filename
-        self.folder_path = self.baseclass.folder_path_sys_info
+        self.folder_path = self.folder_path_systeminformation
         self.output_file_name = "SystemInformation.txt"
 
         # Public IP website link

@@ -15,16 +15,15 @@ from Util.DataClass import DataClass
 class Webcamera(DataClass):
     def __init__(self):
         super().__init__()  # Call the base class __init__ method
-        self.baseclass = DataClass()  # Create an instance of the DataClass
 
         # Constants
-        self.end_time = self.baseclass.end_time
+        self.end_time = self.end_time
 
         # Generate a unique filename for the recording
         self.current_time = time.strftime("%Y%m%d-%H%M%S")
 
         # Folder path and filename
-        self.folder_path = self.baseclass.folder_path_recordings
+        self.folder_path = self.folder_path_webcamera
         self.output_file_name = f"Recording{self.current_time}.mp4"
 
     @staticmethod
@@ -43,7 +42,7 @@ class Webcamera(DataClass):
             print("Unable to determine screen size")
             return 2
 
-        file_path = os.path.join(self.folder_path_recordings, self.output_file_name)
+        file_path = os.path.join(self.folder_path_webcamera, self.output_file_name)
 
         codec = cv2.VideoWriter_fourcc(*"mp4v")
         output = cv2.VideoWriter(file_path, codec, 30.0, screen_size)

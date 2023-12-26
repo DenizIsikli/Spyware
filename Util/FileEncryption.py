@@ -31,11 +31,11 @@ class FileEncryption(DataClass):
 
         # Folders in a list
         self.folders = [
-            self.folder_path_cmd_prompts,
-            self.folder_path_recordings,
-            self.folder_path_screenshots,
+            self.folder_path_cmdprompts,
+            self.folder_path_webcamera,
+            self.folder_path_screenshot,
             self.folder_path_soundfile,
-            self.folder_path_sys_info
+            self.folder_path_systeminformation
         ]
 
         self.base_folder = os.path.dirname(os.path.commonprefix(self.folders))

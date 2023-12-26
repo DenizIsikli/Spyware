@@ -11,11 +11,12 @@ from dataclasses import dataclass
 @dataclass()
 class DataClass:
     base_dir: str = None
-    folder_path_cmd_prompts: str = ""
-    folder_path_recordings: str = ""
-    folder_path_screenshots: str = ""
+    folder_path_cmdprompts: str = ""
+    folder_path_screenshot: str = ""
     folder_path_soundfile: str = ""
-    folder_path_sys_info: str = ""
+    folder_path_statusupdate: str = ""
+    folder_path_systeminformation: str = ""
+    folder_path_webcamera: str = ""
 
     gmail_address_sender: str = ""
     gmail_address_receiver: str = ""
@@ -29,14 +30,19 @@ class DataClass:
         self.create_paths()
 
     def create_paths(self):
-        self.folder_path_cmd_prompts = os.getenv("FOLDER_PATH_CMD_PROMPTS")
-        self.folder_path_recordings = os.getenv("FOLDER_PATH_RECORDINGS")
-        self.folder_path_screenshots = os.getenv("FOLDER_PATH_SCREENSHOTS")
+        # Base directory
+        self.folder_path_cmdprompts = os.getenv("FOLDER_PATH_CMD_PROMPTS")
+        self.folder_path_screenshot = os.getenv("FOLDER_PATH_SCREENSHOTS")
         self.folder_path_soundfile = os.getenv("FOLDER_PATH_SOUNDFILE")
-        self.folder_path_sys_info = os.getenv("FOLDER_PATH_SYS_INFO")
+        self.folder_path_statusupdate = os.getenv("FOLDER_PATH_STATUSUPDATE")
+        self.folder_path_systeminformation = os.getenv("FOLDER_PATH_SYS_INFO")
+        self.folder_path_webcamera = os.getenv("FOLDER_PATH_RECORDINGS")
+
+        # Gmail
         self.gmail_address_sender = os.getenv("GMAIL_ADDRESS_SENDER")
         self.gmail_address_receiver = os.getenv("GMAIL_ADDRESS_RECEIVER")
 
+        # Config
         self.currentDate = date.today()
         self.currentTime = datetime.now()
         self.duration = 300

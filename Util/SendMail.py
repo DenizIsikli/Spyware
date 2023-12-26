@@ -11,14 +11,13 @@ from Util.DataClass import DataClass
 class SendMail(DataClass):
     def __init__(self):
         super().__init__()  # Call the base class __init__ method
-        self.baseclass = DataClass()  # Create an instance of the DataClass
 
         self.mail_subject = "Data"
         self.mail_body = None
 
         # Load config settings - sender and receiver
-        self.gmail_address_sender = self.baseclass.gmail_address_sender
-        self.gmail_address_receiver = self.baseclass.gmail_address_receiver
+        self.gmail_address_sender = self.gmail_address_sender
+        self.gmail_address_receiver = self.gmail_address_receiver
 
     def send_mail(self, zip_file_path):
         message = MIMEMultipart("alternative")

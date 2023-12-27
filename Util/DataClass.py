@@ -6,11 +6,11 @@ import time
 # External libraries
 from datetime import date, datetime
 from dataclasses import dataclass
+from dotenv import load_dotenv
 
 
 @dataclass()
 class DataClass:
-    base_dir: str = None
     folder_path_cmdprompts: str = ""
     folder_path_screenshot: str = ""
     folder_path_soundfile: str = ""
@@ -28,10 +28,13 @@ class DataClass:
 
     def __init__(self):
         self.create_paths()
+        self.base_dir = "/config/config.env"
 
     def create_paths(self):
+        load_dotenv(dotenv_path=self.base_dir, verbose=True)
+
         # Base directory
-        self.folder_path_cmdprompts = os.getenv("FOLDER_PATH_CMD_PROMPTS")
+        self.folder_path_cmdprompts = os.getenv("FOLDER_PATH_CMDPROMPTS")
         self.folder_path_screenshot = os.getenv("FOLDER_PATH_SCREENSHOTS")
         self.folder_path_soundfile = os.getenv("FOLDER_PATH_SOUNDFILE")
         self.folder_path_statusupdate = os.getenv("FOLDER_PATH_STATUSUPDATE")

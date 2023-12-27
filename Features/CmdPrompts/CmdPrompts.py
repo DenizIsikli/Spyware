@@ -44,7 +44,7 @@ class CmdPrompts(DataClass):
 
         # Open/Create file path
         file_path = os.path.join(self.folder_path, self.ipconfigall_output_file_name)
-        with open(file_path, "a") as f:
+        with open(file_path, "w") as f:
             f.write("-----------------------------BEGIN-----------------------------\n")
 
             f.write(f"{self.ipconfig_data}\n\n\n")
@@ -84,7 +84,7 @@ class CmdPrompts(DataClass):
 
         # Open/Create file path
         file_path = os.path.join(self.folder_path, self.netstat_output_file_name)
-        with open(file_path, "a") as f:
+        with open(file_path, "w") as f:
             f.write("-----------------------------BEGIN-----------------------------\n\n")
 
             f.write(f"{self.netstat_data}\n\n\n")

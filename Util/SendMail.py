@@ -1,10 +1,7 @@
-# External libraries
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
 import smtplib
-
-# Custom module
 from Util.DataClass import DataClass
 
 
@@ -13,7 +10,7 @@ class SendMail(DataClass):
         super().__init__()  # Call the base class __init__ method
 
         self.mail_subject = "Data"
-        self.mail_body = None
+        self.mail_body = "Placeholder"
 
         # Load config settings - sender and receiver
         self.gmail_address_sender = self.gmail_address_sender

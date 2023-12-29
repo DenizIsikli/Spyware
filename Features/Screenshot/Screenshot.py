@@ -1,12 +1,7 @@
-# Built-in modules
 import os
 import sys
 import time
-
-# External libraries
 from PIL import ImageGrab
-
-# Custom module
 from Util.DataClass import DataClass
 
 
@@ -18,17 +13,18 @@ class Screenshot(DataClass):
         self.end_time = self.end_time
         self.counter = 0
         self.sleepAmount = 1
-        self.image = None
+        self.image = ImageGrab.grab()
 
         # Generate a unique filename for the sub-folders
         self.current_time = time.strftime("%Y%m%d-%H%M%S")
 
         # Folder path and folder name
         self.folder_path = self.folder_path_screenshot
-        self.folder_name = f"Subfolder{self.current_time}"
+        os.makedirs(self.folder_path, exist_ok=True)
+        self.subfolder_name = f"Subfolder{self.current_time}"
 
     def create_subfolder(self):
-        subfolder_path = os.path.join(self.folder_path, self.folder_name)
+        subfolder_path = os.path.join(self.folder_path, self.subfolder_name)
 
         if not os.path.exists(subfolder_path):
             os.makedirs(subfolder_path)

@@ -1,9 +1,6 @@
-# Built-in modules
 import os
 import platform
 import subprocess
-
-# Custom module
 from Util.DataClass import DataClass
 
 
@@ -13,12 +10,13 @@ class CmdPrompts(DataClass):
 
         # Folder path and filename
         self.folder_path = self.folder_path_cmdprompts
+        os.makedirs(self.folder_path, exist_ok=True)
         self.ipconfigall_output_file_name = "Ipconfig.txt"
         self.netstat_output_file_name = "Netstat.txt"
 
         # Default value
-        self.ipconfig_data = None
-        self.netstat_data = None
+        self.ipconfig_data = ""
+        self.netstat_data = ""
 
     def ipconfig_all(self):
         platform_switch = {

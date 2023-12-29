@@ -1,13 +1,8 @@
-# Built-in modules
 import os
 import platform
 import socket
-
-# External libraries
 from requests import get
 from getmac import get_mac_address
-
-# Custom module
 from Util.DataClass import DataClass
 
 
@@ -17,6 +12,7 @@ class SystemInformation(DataClass):
 
         # Folder path and filename
         self.folder_path = self.folder_path_systeminformation
+        os.makedirs(self.folder_path, exist_ok=True)
         self.output_file_name = "SystemInformation.txt"
 
         # Public IP website link
@@ -26,7 +22,7 @@ class SystemInformation(DataClass):
         self.mac_address = get_mac_address()
 
         # Default value
-        self.os_info = None
+        self.os_info = ""
 
     def system_information(self):
         platform_switch = {

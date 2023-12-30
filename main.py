@@ -31,19 +31,6 @@ class Main(DataClass):
         method()
 
     def main(self):
-        ascii_art = """
-               _____                                    
-              / ____|                                   
-             | (___  _ __  _   ___      ____ _ _ __ ___ 
-              \___ \| '_ \| | | \ \ /\ / / _` | '__/ _ \
-              ____) | |_) | |_| |\ V  V / (_| | | |  __/
-             |_____/| .__/ \__, | \_/\_/ \__,_|_|  \___|
-                    | |     __/ |                       
-                    |_|    |___/                                                    
-            """
-
-        print(ascii_art)
-
         try:
             processes = [
                 Process(target=self.run_feature, args=(CmdPrompts, 'ipconfig_all')),

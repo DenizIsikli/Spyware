@@ -12,7 +12,7 @@ class FileEncryption(DataClass):
         super().__init__()  # Call the base class __init__ method
 
         # Sender mail instance
-        self.mailer = SendMail.SendMail
+        self.mailer = SendMail
 
         # Constants
         self.zip_file_path = 'Encrypted_Folders.zip'
@@ -76,7 +76,7 @@ class FileEncryption(DataClass):
                     zip_file.write(file_path, os.path.relpath(file_path, self.encrypted_folders_dir))
 
     def send_email(self):
-        self.mailer.send_mail(self.zip_file_path)
+        self.mailer.SendMail().send_mail(self.zip_file_path)
 
     def delete_files(self):
         for folder in self.folders:

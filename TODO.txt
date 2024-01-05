@@ -1,3 +1,2 @@
- - Fix environment variables, check discord bot project
  - Test encryption and send mail
  - Implement status update within every file

